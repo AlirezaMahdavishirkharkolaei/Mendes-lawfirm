@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+/*
+ * Bridges Mendes design tokens (src/styles/tokens.css) into Tailwind's
+ * theme layer so components can use ordinary utility classes — e.g.
+ * bg-surface, text-ink, font-display, text-h1, rounded-button — instead
+ * of ad-hoc inline styles or arbitrary values. "inline" keeps these as
+ * live var() references (not statically inlined), so overriding a value
+ * in tokens.css — or overriding a --font-* variable via next/font/local's
+ * generated class later — updates every utility that uses it.
+ */
+@theme inline {
+  --color-surface: var(--mendes-surface);
+  --color-surface-alt: var(--mendes-surface-alt);
+  --color-ink: var(--mendes-ink);
+  --color-ink-muted: var(--mendes-ink-muted);
+  --color-border: var(--mendes-border);
+  --color-accent: var(--mendes-accent);
+  --color-accent-hover: var(--mendes-accent-hover);
+  --color-surface-dark: var(--mendes-surface-dark);
+  --color-ink-dark: var(--mendes-ink-dark);
+  --color-accent-on-dark: var(--mendes-accent-on-dark);
+
+  --font-display: var(--mendes-font-display);
+  --font-body: var(--mendes-font-body);
+  --font-mono: var(--mendes-font-mono);
+
+  --text-ui-sm: var(--mendes-text-ui-sm);
+  --text-ui: var(--mendes-text-ui);
+  --text-body: var(--mendes-text-body);
+  --text-body--line-height: 1.65;
+  --text-lead: var(--mendes-text-lead);
+  --text-lead--line-height: 1.6;
+  --text-h3: var(--mendes-text-h3);
+  --text-h3--line-height: 1.3;
+  --text-h2: var(--mendes-text-h2);
+  --text-h2--line-height: 1.2;
+  --text-h1: var(--mendes-text-h1);
+  --text-h1--line-height: 1.15;
+  --text-display: var(--mendes-text-display);
+  --text-display--line-height: 1.05;
+
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.01em;
+  --tracking-mono: 0.08em;
+
+  --radius-button: 3px;
+  --radius-card: 4px;
+
+  --ease-editorial: var(--mendes-ease-editorial);
+}
+
+/* ---------------------------------------------------------------
+ * Base styles
+ * ------------------------------------------------------------- */
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* Visible focus state everywhere — never suppressed without an
+ * equivalent replacement. 2px accent outline, offset so it doesn't
+ * collide with hairline borders on form fields. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------
+ * Motion: default reveal primitive used by components/ui/Reveal.tsx
+ *
+ * Progressive enhancement: with no JS, .reveal elements are never
+ * given the "hidden" pre-state (that's applied by JS after mount), so
+ * content is fully visible by default. With JS + no reduced-motion
+ * preference, Reveal.tsx toggles data-visible to trigger the
+ * transition below. This block only defines the transition itself;
+ * it never hides content on its own.
+ * ------------------------------------------------------------- */
+.reveal {
+  transition:
+    opacity var(--mendes-duration-reveal) var(--ease-editorial),
+    transform var(--mendes-duration-reveal) var(--ease-editorial);
+}
+
+.reveal[data-visible="false"] {
+  opacity: 0;
+  transform: translateY(var(--mendes-reveal-distance));
+}
+
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-visible="false"],
+  .reveal[data-visible="true"] {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Visually-hidden utility for skip links and screen-reader-only text */
+.sr-only-until-focus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only-until-focus:focus {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: auto;
+  height: auto;
+  padding: 12px 20px;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  z-index: 100;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+}
