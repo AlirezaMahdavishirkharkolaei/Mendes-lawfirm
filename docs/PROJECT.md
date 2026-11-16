@@ -1,0 +1,58 @@
+# Mendes — Project Overview
+
+## What this is
+
+Mendes is a premium, technology-oriented law firm website. The initial
+scope is the public-facing marketing site: Home, About, Practice Areas,
+Attorneys/Team, Insights/Articles, Resources, Contact, and Consultation
+Request.
+
+The site must communicate trust, legal expertise, professionalism,
+modernity, luxury, precision, confidentiality, and technological
+sophistication — without looking like a generic law-firm template.
+
+## Current phase
+
+**v0.5: public site.** The site has all public pages (Home, About,
+Practice areas with a page per area, Contact, Consultation request,
+Privacy, Legal disclaimer) in English, Turkish and Persian, built as a
+static site. Team and Insights pages are ready and appear as soon as
+approved profiles or articles are added to `src/content/`.
+
+## Content policy
+
+- Only facts confirmed by the firm are published: no invented people,
+  credentials, figures, client results or testimonials.
+- Optional details (address, phone, hours, team) are hidden until they
+  are provided, never replaced with placeholder text.
+- No superlatives or claims about results; descriptions say what the
+  firm does. This keeps the site within professional-conduct rules on
+  lawyers' advertising, which the supervising attorney should confirm
+  before launch.
+
+## What is explicitly out of scope right now
+
+The following are planned for future phases and must not be implemented
+without explicit instruction:
+
+- Client Portal
+- Case Management
+- Document Management
+- Appointment Management
+- Secure Client Communication
+- Legal AI / Contract Analysis / Legal Research / Document Intelligence
+- Any paid CMS, CRM, scheduling, analytics, or AI API integration
+
+## Cost constraint
+
+This project is built to run at zero or near-zero cost during development
+and MVP. Do not add paid services without explicit approval. See
+`ARCHITECTURE.md` for how content and future integrations are structured
+to allow paid services to be added later without a rewrite.
+
+## Where to go next
+
+- `ARCHITECTURE.md` — how the codebase is structured and why
+- `DEVELOPMENT.md` — how to run and work on the project locally
+- `SECURITY.md` — security posture and constraints
+- `DEPLOYMENT.md` — how the project is intended to be deployed
