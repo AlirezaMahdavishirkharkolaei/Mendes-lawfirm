@@ -1,45 +1,66 @@
-# Font assets
+# Mendes — law firm website
 
-This directory is where licensed, self-hosted font files must be placed
-before `src/lib/fonts.ts` is wired into the app. No font files exist here
-yet — this task deliberately does not fetch or invent any, per the
-project's instruction not to add unverified font files.
+Website of **Mendes Law and Consultancy**, Northern Cyprus. It is a fully static Next.js 16 site in **English, Turkish and Persian** (Persian is right to left), with no server and no tracking.
 
-## Expected files
+**Live:** https://alirezamahdavishirkharkolaei.github.io/mendes-lawfirm/
+
+| Page | Path |
+|---|---|
+| Home | `/{en,tr,fa}/` |
+| About | `/{lang}/about/` |
+| Practice areas, plus a page for each area | `/{lang}/practice-areas/`, `/{lang}/practice-areas/{slug}/` |
+| Contact | `/{lang}/contact/` |
+| Consultation request | `/{lang}/consultation/` |
+| Privacy, legal disclaimer | `/{lang}/privacy/`, `/{lang}/disclaimer/` |
+| Team, insights | Appear by themselves once profiles or articles are added in `src/content/` |
+
+The root path `/` sends visitors to their browser language and falls back to English.
+
+## Highlights
+
+- **Three languages:**
+  - Every page is prerendered in each language, with `hreflang` alternates and a sitemap.
+  - The language switcher keeps you on the same page.
+  - Persian pages use Vazirmatn and a mirrored layout.
+- **The consultation request needs no backend:**
+  - The form is checked in the browser with zod.
+  - It then opens the visitor's email app, or WhatsApp once a number is configured, with a structured request.
+  - Nothing is stored or sent to a third party, and the privacy page says so.
+  - A practice-area page links to the form with that area already selected.
+- **Content-first architecture:**
+  - Firm details, practice areas, team and articles live in `src/content/` and are validated with zod at build time.
+  - A detail the firm has not provided is left out of the page; the site never shows a placeholder in its place.
+- **Design system "The Citation Mark":**
+  - Fonts: Fraunces, IBM Plex Sans and IBM Plex Mono, self-hosted through `@fontsource`.
+  - Design tokens are defined in `src/styles/tokens.css`.
+  - The site follows an accessibility baseline: a skip link, visible focus, reduced-motion support, and a mobile menu that traps keyboard focus.
+- **Quality:**
+  - ESLint, TypeScript and Vitest tests cover the dictionaries, content integrity, the sitemap and the consultation-request logic.
+  - CI runs these checks on every push.
+  - GitHub Pages deploys `main` automatically.
+
+## Develop
+
+```bash
+npm ci
+npm run dev          # http://localhost:3000/en/
+npm test && npm run lint && npm run typecheck
+npm run build        # static site in out/
+npm run build:pages  # same, under the /mendes-lawfirm base path
+```
+
+## Where things live
 
 ```
-src/assets/fonts/
-├── fraunces/
-│   └── Fraunces-Variable.woff2
-├── ibm-plex-sans/
-│   ├── IBMPlexSans-Regular.woff2
-│   ├── IBMPlexSans-Medium.woff2
-│   └── IBMPlexSans-SemiBold.woff2
-└── ibm-plex-mono/
-    ├── IBMPlexMono-Regular.woff2
-    └── IBMPlexMono-Medium.woff2
+src/app/[lang]/       pages (root layout per language)
+src/app/(root)/       "/" → language redirect
+src/i18n/             locales and the en / tr / fa dictionaries
+src/content/          firm details, practice areas, team, insights
+src/components/       ui primitives, layout chrome, page sections, forms
+src/lib/              navigation, SEO helpers, zod schemas
+docs/                 PROJECT, ARCHITECTURE, DESIGN-SYSTEM, DEVELOPMENT, DEPLOYMENT, SECURITY
 ```
 
-Both Fraunces and IBM Plex are open source under the SIL Open Font
-License. Source them from their official repositories (or a trusted
-distributor such as Google Fonts' own hosting) rather than an arbitrary
-third-party download, and keep the license file alongside them or in a
-top-level `LICENSES/` folder per the license's redistribution terms.
+## Credits
 
-## Activation
-
-Once the files above exist:
-
-1. Open `src/lib/fonts.ts` and uncomment the `next/font/local`
-   declarations (`displayFont`, `bodyFont`, `monoFont`).
-2. Import them into `src/app/layout.tsx` and add their `.variable`
-   classes to the `<html>` element's `className`.
-3. Nothing else changes — `globals.css` already reads font families
-   through the `--font-display` / `--font-body` / `--font-mono` custom
-   properties (see `src/styles/tokens.css`), and `next/font/local`
-   generates those exact variable names, so its output overrides the
-   system-font fallback automatically via normal CSS cascade rules.
-
-Until this is done, the site renders with system-font fallbacks — never
-a runtime Google Fonts request — so nothing is broken by the fonts not
-being present yet.
+Built by **Alireza Mahdavishirkharkolaei** for Mendes Law and Consultancy.
