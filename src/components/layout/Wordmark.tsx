@@ -3,9 +3,8 @@ import Link from "next/link";
 export function Wordmark({ locale, compact = false }: { locale: string; compact?: boolean }) {
   return (
     <Link href={`/${locale}`} className="group flex items-center gap-3" aria-label="Mendes — home">
-      <span aria-hidden className="relative grid h-10 w-10 place-items-center rounded-full border border-gold/50 transition-all duration-700 ease-editorial group-hover:rotate-[360deg] group-hover:border-gold">
-        <span className="font-display text-2xl italic leading-none text-gold">§</span>
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/mendes-crest-sm.webp" alt="" aria-hidden width={36} height={44} className="h-11 w-9 object-contain drop-shadow-[0_0_10px_rgba(201,169,106,0.25)] transition-transform duration-700 ease-editorial group-hover:scale-110" />
       {!compact && (
         <span className="flex flex-col leading-none" dir="ltr">
           <span className="font-display text-[1.45rem] font-normal uppercase tracking-[0.34em] text-ivory">Mendes</span>

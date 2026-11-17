@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function Contact({ params }: { params: Promise<{ locale: string }> }) {
   const { d, settings, l } = await pageContext(params);
-  const email = settings.boss_email?.split(",")[0]?.trim();
+  const email = settings.office_email || settings.boss_email?.split(",")[0]?.trim();
   return (
     <>
       <PageHero label={d.nav.contact} title={d.home.ctaTitle} lead={d.home.ctaSub}>
@@ -31,6 +31,7 @@ export default async function Contact({ params }: { params: Promise<{ locale: st
           <Reveal key={label} index={i} className="bg-night p-10">
             <p className="label">{label}</p>
             <p className="mt-5 font-display text-2xl font-light" dir={i > 0 ? "ltr" : undefined}>{value || "—"}</p>
+            {i === 0 && settings.office_map_url && <a href={settings.office_map_url} target="_blank" rel="noopener noreferrer" className="label link-grow mt-5 inline-block">Google Maps ↗</a>}
           </Reveal>
         ))}
       </Container>

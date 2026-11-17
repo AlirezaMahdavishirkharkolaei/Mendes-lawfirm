@@ -28,6 +28,8 @@ export default async function Settings() {
             <Field label="Outreach reply-to address" htmlFor="outreach_reply_to" hint="Where prospects' replies go (route it to this Worker to log them automatically)."><Input id="outreach_reply_to" name="outreach_reply_to" defaultValue={s.outreach_reply_to} /></Field>
             <Field label="Office phone" htmlFor="office_phone"><Input id="office_phone" name="office_phone" defaultValue={s.office_phone} /></Field>
             <Field label="Office address" htmlFor="office_address"><Input id="office_address" name="office_address" defaultValue={s.office_address} /></Field>
+            <Field label="Public office e-mail" htmlFor="office_email" hint="Shown on the site and used when a team member has no e-mail."><Input id="office_email" name="office_email" defaultValue={s.office_email} /></Field>
+            <Field label="Google Maps link" htmlFor="office_map_url"><Input id="office_map_url" name="office_map_url" defaultValue={s.office_map_url} /></Field>
             <Field label="Site-wide announcement (optional)" htmlFor="announcement"><Input id="announcement" name="announcement" defaultValue={s.announcement} /></Field>
           </div>
         </Panel>

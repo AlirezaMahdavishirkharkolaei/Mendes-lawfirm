@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       canonical: `/${locale}`,
       languages: Object.fromEntries(locales.map((l) => [l, `/${l}`])),
     },
-    openGraph: { title: d.meta.title, description: d.meta.description, type: "website", locale: localeMeta[locale].intl },
-    icons: { icon: "/favicon.ico" },
+    openGraph: { title: d.meta.title, description: d.meta.description, type: "website", locale: localeMeta[locale].intl, images: [{ url: "/brand/icon-512.png", width: 512, height: 512 }] },
+    icons: { icon: [{ url: "/favicon.ico" }, { url: "/brand/favicon-64.png", type: "image/png", sizes: "64x64" }], apple: "/brand/apple-touch-icon.png" },
   };
 }
 
@@ -44,7 +44,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         )}
         <Header locale={locale} items={nav} cta={{ href: l("/booking"), label: d.nav.booking }} portal={{ href: l("/portal"), label: d.nav.portal }} labels={{ menu: d.nav.menu, close: d.nav.close, language: d.nav.language }} />
         <main id="main" className="flex-1">{children}</main>
-        <Footer locale={locale} d={d} office={{ address: settings.office_address || "", phone: settings.office_phone || "", email: settings.boss_email?.split(",")[0]?.trim() || "" }} />
+        <Footer locale={locale} d={d} office={{ address: settings.office_address || "", phone: settings.office_phone || "", email: settings.office_email || settings.boss_email?.split(",")[0]?.trim() || "", mapUrl: settings.office_map_url || "" }} />
         {settings.chatbot_enabled !== "0" && <ChatWidget locale={locale} t={d.chat} bookingHref={l("/booking")} />}
       </body>
     </html>

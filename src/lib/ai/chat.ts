@@ -1,5 +1,6 @@
 import "server-only";
 import { db, now, uuid } from "@/lib/db";
+import { getSettings } from "@/lib/settings";
 import { localeMeta, type Locale } from "@/lib/i18n/config";
 import { listTeam, publicCard, routeToMember, type PublicCard } from "@/lib/data/team";
 import { TOPIC_KEYS, TOPICS, classifyTopics, isTopic, topicLabel, type TopicKey } from "@/lib/topics";
@@ -42,6 +43,11 @@ const FALLBACK: Record<Locale, { found: (topics: string, name: string) => string
   ru: { found: (t, n) => `Спасибо. Судя по описанию, вопрос касается темы «${t}». Лучше всего у нас этим занимается ${n} — свяжитесь напрямую по контактам ниже или запишитесь на встречу.`, ask: "Спасибо. Расскажите чуть подробнее: речь о договоре, компании, недвижимости, налогах, трудовых или семейных вопросах либо о чём-то, что произошло в интернете?" },
   ar: { found: (t, n) => `شكرًا لك. بحسب ما وصفت، تتعلق المسألة بـ ${t}. أنسب شخص في فريقنا لذلك هو ${n} — يمكنك التواصل معه مباشرة عبر البيانات أدناه أو حجز اجتماع.`, ask: "شكرًا لك. هل يمكنك توضيح المزيد؟ مثلًا هل الأمر يتعلق بعقد، أو شركة، أو عقار، أو ضرائب، أو عمل، أو مسائل أسرية، أو شيء حدث عبر الإنترنت؟" },
 };
+
+async function officeContact() {
+  const s = await getSettings();
+  return { phone: s.office_phone, email: s.office_email || s.boss_email?.split(",")[0]?.trim() };
+}
 
 export async function chat(input: { sessionId?: string | null; message: string; locale: Locale; firm: string }): Promise<ChatReply> {
   const database = await db();
@@ -124,6 +130,6 @@ export async function chat(input: { sessionId?: string | null; message: string; 
     sessionId,
     reply,
     topics: topics.map((key) => ({ key, label: topicLabel(key, input.locale) })),
-    specialist: specialist ? publicCard(specialist, input.locale) : null,
+    specialist: specialist ? publicCard(specialist, input.locale, await officeContact()) : null,
   };
 }

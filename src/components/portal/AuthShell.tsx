@@ -7,7 +7,11 @@ export function AuthShell({ title, lead, children, footer }: { title: string; le
       <div className="aurora absolute -inset-[20%] -z-10 opacity-70" aria-hidden />
       <Container className="grid items-center gap-16 lg:grid-cols-2">
         <div className="hidden lg:block">
-          <Seal className="h-[420px] w-[420px] opacity-80" />
+          <div className="relative h-[460px] w-[460px]">
+            <Seal className="absolute inset-0 h-full w-full opacity-40" bare />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/mendes-crest.webp" alt="" aria-hidden className="crest-float absolute inset-0 m-auto h-[62%]" />
+          </div>
         </div>
         <div className="w-full max-w-lg rounded-[6px] border border-line bg-night-2/80 p-8 backdrop-blur-xl md:p-12">
           <h1 className="font-display text-h2 font-light">{title}</h1>

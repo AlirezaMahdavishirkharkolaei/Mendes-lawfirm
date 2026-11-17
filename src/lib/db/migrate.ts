@@ -1,6 +1,7 @@
 import "server-only";
 import init from "../../../migrations/0001_init.sql?raw";
 import fileBlobs from "../../../migrations/0002_file_blobs.sql?raw";
+import realTeam from "../../../migrations/0003_real_team.sql?raw";
 import { seed } from "./seed";
 
 /**
@@ -11,6 +12,7 @@ import { seed } from "./seed";
 const MIGRATIONS: { name: string; sql: string }[] = [
   { name: "0001_init.sql", sql: init },
   { name: "0002_file_blobs.sql", sql: fileBlobs },
+  { name: "0003_real_team.sql", sql: realTeam },
 ];
 
 function statements(sql: string): string[] {

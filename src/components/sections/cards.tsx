@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/misc";
 export function initials(name: string) {
   return name
     .split(/\s+/)
-    .filter(Boolean)
+    .filter((part) => part && !part.endsWith(".")) // skip titles like "Av." / "Dr."
     .slice(0, 2)
     .map((p) => p[0])
     .join("")

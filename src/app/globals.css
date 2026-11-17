@@ -221,6 +221,13 @@ html[dir="rtl"] .draw-line { transform-origin: right; }
 .orbit { animation: orbit 60s linear infinite; transform-origin: center; }
 @keyframes orbit { to { transform: rotate(360deg); } }
 
+/* Crest gently floating in the hero */
+.crest-float { animation: crest-float 9s var(--ease-silk) infinite alternate; }
+@keyframes crest-float {
+  from { transform: translateY(-6px); filter: drop-shadow(0 0 24px rgba(201, 169, 106, 0.18)); }
+  to { transform: translateY(8px); filter: drop-shadow(0 0 48px rgba(201, 169, 106, 0.32)); }
+}
+
 /* Aurora glow behind the hero */
 .aurora {
   background:

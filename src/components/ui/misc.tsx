@@ -47,7 +47,7 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
   return <div className={`rounded-[4px] border border-line bg-night-2/80 backdrop-blur-sm ${className}`}>{children}</div>;
 }
 
-export function Seal({ className = "" }: { className?: string }) {
+export function Seal({ className = "", bare = false }: { className?: string; bare?: boolean }) {
   return (
     <svg viewBox="0 0 200 200" className={className} aria-hidden direction="ltr" style={{ direction: "ltr" }}>
       <defs>
@@ -65,7 +65,7 @@ export function Seal({ className = "" }: { className?: string }) {
           <textPath href="#seal-circle">MENDES · LAW · CONSULTANCY · NORTH CYPRUS · </textPath>
         </text>
       </g>
-      <text x="100" y="118" textAnchor="middle" fill="url(#seal-gold)" fontSize="58" fontFamily="Cormorant Garamond Variable, Georgia, serif" fontStyle="italic">§</text>
+      {!bare && <text x="100" y="118" textAnchor="middle" fill="url(#seal-gold)" fontSize="58" fontFamily="Cormorant Garamond Variable, Georgia, serif" fontStyle="italic">§</text>}
     </svg>
   );
 }

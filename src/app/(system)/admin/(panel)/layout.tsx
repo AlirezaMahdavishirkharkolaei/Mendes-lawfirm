@@ -41,7 +41,8 @@ export default async function PanelLayout({ children }: { children: ReactNode })
     <div className="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
       <aside className="border-b border-line bg-night-2 p-5 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-e lg:p-6">
         <Link href="/admin" className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full border border-gold/50 font-display text-2xl italic text-gold">§</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/mendes-crest-sm.webp" alt="" width={34} height={42} className="h-11 w-9 object-contain" />
           <span>
             <span className="block font-display text-lg uppercase tracking-[0.3em]">Mendes</span>
             <span className="block font-mono text-[0.55rem] uppercase tracking-[0.3em] text-ivory-muted">Control room</span>

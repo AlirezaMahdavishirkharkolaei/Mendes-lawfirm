@@ -3,7 +3,7 @@ import type { Dictionary } from "@/lib/i18n";
 import { Wordmark } from "./Wordmark";
 import { Container } from "@/components/ui/misc";
 
-export function Footer({ locale, d, office }: { locale: string; d: Dictionary; office: { address: string; phone: string; email: string } }) {
+export function Footer({ locale, d, office }: { locale: string; d: Dictionary; office: { address: string; phone: string; email: string; mapUrl?: string } }) {
   const l = (p: string) => `/${locale}${p}`;
   const year = new Date().getFullYear();
   return (
@@ -37,6 +37,7 @@ export function Footer({ locale, d, office }: { locale: string; d: Dictionary; o
           <p className="label mb-5">{d.footer.office}</p>
           <address className="space-y-3 text-ui not-italic text-ivory/80">
             <p>{office.address}</p>
+            {office.mapUrl && <p><a className="link-grow text-gold hover:text-gold-light" href={office.mapUrl} target="_blank" rel="noopener noreferrer">Google Maps ↗</a></p>}
             {office.phone && <p><a className="link-grow hover:text-gold-light" href={`tel:${office.phone.replace(/\s/g, "")}`} dir="ltr">{office.phone}</a></p>}
             {office.email && <p><a className="link-grow hover:text-gold-light" href={`mailto:${office.email}`}>{office.email}</a></p>}
           </address>

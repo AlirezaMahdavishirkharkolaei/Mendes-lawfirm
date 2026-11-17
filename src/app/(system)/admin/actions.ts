@@ -465,7 +465,7 @@ export async function saveContent(_: AdminState, form: FormData): Promise<AdminS
 }
 
 const SETTING_KEYS = [
-  "firm_name", "boss_email", "owner_email", "report_recipients", "outreach_reply_to", "office_phone", "office_address",
+  "firm_name", "boss_email", "owner_email", "report_recipients", "outreach_reply_to", "office_phone", "office_address", "office_email", "office_map_url",
   "booking_days", "booking_start", "booking_end", "booking_slot_minutes", "booking_timezone", "booking_horizon_days",
   "ai_provider", "ai_model", "outreach_daily_limit", "announcement",
 ];

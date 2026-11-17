@@ -97,13 +97,14 @@ export function routeToMember(topics: TopicKey[], team: TeamMember[]): TeamMembe
   return topics.length ? active[0] : null;
 }
 
-export function publicCard(member: TeamMember, locale: Locale) {
+/** Contact card for a member; falls back to the office phone/e-mail when the member has none. */
+export function publicCard(member: TeamMember, locale: Locale, office?: { phone?: string; email?: string }) {
   return {
     slug: member.slug,
     name: member.name,
     position: pick(member.position, locale),
-    email: member.email,
-    phone: member.phone,
+    email: member.email || office?.email || null,
+    phone: member.phone || office?.phone || null,
     photoUrl: member.photoUrl,
   };
 }

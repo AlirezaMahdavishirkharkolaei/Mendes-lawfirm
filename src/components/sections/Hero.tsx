@@ -11,8 +11,10 @@ export function Hero({ eyebrow, headline, sub, primary, secondary, scroll }: { e
       <HeroParallax>
         <div className="aurora absolute -inset-[20%] -z-10" aria-hidden />
         <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(201,169,106,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(201,169,106,0.06)_1px,transparent_1px)] bg-[size:110px_110px] [mask-image:radial-gradient(ellipse_at_center,#000_20%,transparent_75%)]" />
-        <div data-depth="0.6" className="absolute -end-40 top-28 -z-10 hidden h-[520px] w-[520px] opacity-45 md:block lg:-end-16 xl:end-[2%]">
-          <Seal className="h-full w-full" />
+        <div data-depth="0.6" className="absolute -end-40 top-24 -z-10 hidden h-[560px] w-[560px] md:block lg:-end-20 xl:end-[1%]">
+          <Seal className="absolute inset-0 h-full w-full opacity-40" bare />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/mendes-crest.webp" alt="" aria-hidden className="crest-float absolute inset-0 m-auto h-[64%] opacity-80 drop-shadow-[0_0_40px_rgba(201,169,106,0.25)]" />
         </div>
       </HeroParallax>
 
