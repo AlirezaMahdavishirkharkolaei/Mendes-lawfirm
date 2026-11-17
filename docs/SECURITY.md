@@ -1,48 +1,33 @@
-# Security
+# Security & privacy
 
-## Current posture
+## Authentication
 
-This is a foundation-phase public marketing site with no authentication,
-no client data storage, and no form submission handling implemented yet.
-The attack surface today is minimal by design.
+- Passwords are hashed with PBKDF2-SHA256 (100,000 iterations, per-user salt) using WebCrypto. Login does a dummy hash for unknown e-mails to blunt timing-based enumeration.
+- Sessions use a random 256-bit token in an `HttpOnly; Secure; SameSite=Lax` cookie. Only its SHA-256 hash is stored. Sessions expire after 14 days and are revoked on password change or account deactivation.
+- Staff never handle passwords. Invited users set their own through a one-time, expiring, hashed token.
+- The first admin is created at `/admin/setup`, which needs the `ADMIN_SETUP_TOKEN` secret and disables itself once an admin exists.
 
-## Principles for what comes next
+## Authorization
 
-These apply as soon as form handling (Contact, Consultation Request) or
-any future client-facing feature is implemented:
+- Roles: `client`, `lawyer`, `admin`, `author`. Every admin page checks the role itself (layouts alone are not trusted), and firm-wide pages require `admin`.
+- A case and its documents are visible only to the case's client, its assigned lawyer and admins (`canAccessCase`). Document downloads re-check this on every request and are logged.
+- Booking decision links and unsubscribe links are HMAC-SHA256 signed with expiry. Decisions need an explicit POST on a confirmation page, so a link preview can't approve or reject by accident.
 
-- **Server-side validation is mandatory.** Every form input must be
-  validated against its Zod schema (see `src/lib/schemas/`) on the
-  server, not just in the client. Client-side validation is a UX
-  affordance, not a security boundary.
-- **No secrets in the client bundle.** Any future API keys or credentials
-  (e.g. for an email-sending provider) must be read from server-only
-  environment variables and never exposed to `NEXT_PUBLIC_*` unless the
-  value is genuinely safe to expose publicly.
-- **Confidentiality by default.** This is a law firm. Any future feature
-  that could touch client-identifying information (consultation request
-  contents, future client portal data) must be treated as sensitive by
-  default — encrypted in transit (HTTPS, enforced by Vercel/hosting),
-  and not logged in plaintext.
-- **Spam/abuse mitigation on public forms.** The consultation request
-  schema (`src/lib/schemas/consultation-request.ts`) includes a honeypot
-  field as a first line of defense. This is a minimal, free measure — if
-  abuse becomes a real problem, evaluate options (including paid ones)
-  separately rather than silently adding a paid service.
-- **No fabricated professional claims.** Content in `src/content/` must
-  never present placeholder/demonstration attorneys, credentials, or
-  publications as real. This is enforced today only by the
-  `isPlaceholder` flag and file-level comments — it is a content
-  discipline requirement, not something the code can fully guarantee.
-- **Dependency hygiene.** Avoid adding dependencies casually. Every new
-  dependency is additional attack surface and additional maintenance
-  burden. Run `npm audit` periodically.
+## Input & output
 
-## Not yet addressed (flag before building)
+- All form input is validated with Zod on the server. Uploads are limited to 20 MB with a MIME allow-list, stored in R2 under random keys and served with `nosniff` and a sandboxing CSP.
+- User-submitted Markdown is HTML-escaped before rendering. Links are limited to `http(s)`/`mailto` with `rel="nofollow noopener"`.
+- Rate limits (D1): login, registration, password reset, booking, chat, uploads and article submissions. Booking has a honeypot field.
+- Server actions get Next.js's built-in Origin check. JSON route handlers check Origin explicitly.
+- Security headers: HSTS, `X-Frame-Options: DENY`, `nosniff`, Referrer-Policy and Permissions-Policy.
 
-- Rate limiting on any future public form endpoint
-- CSRF considerations for any future authenticated area
-- A real spam-prevention strategy beyond the honeypot field, if abuse is
-  observed
-- Data retention policy for consultation request submissions, once that
-  flow actually stores or forwards data
+## Privacy
+
+- Chat transcripts are anonymous (no account link) and admins can delete them. IP addresses are only ever stored as salted hashes.
+- Outreach goes only to business addresses that staff add, every message is approved by a person, and each one includes an unsubscribe link and RFC 8058 one-click headers. Unsubscribes are permanent.
+- The AI provider receives chat messages, law titles and prospect details. It never receives case files or client documents.
+- Every significant action is written to `audit_log` (Admin → Activity log).
+
+## Secrets
+
+`AUTH_SECRET`, `ADMIN_SETUP_TOKEN` and the AI keys are Worker secrets. They are never stored in the repository or the database. `.dev.vars` is git-ignored.

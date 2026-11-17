@@ -1,110 +1,52 @@
 import Link from "next/link";
+import type { Dictionary } from "@/lib/i18n";
 import { Wordmark } from "./Wordmark";
-import { PageContainer } from "./Container";
-import { primaryNav, footerLegalLinks } from "@/lib/navigation";
-import { practiceAreas } from "@/content/practice-areas";
+import { Container } from "@/components/ui/misc";
 
-/**
- * Global site footer. Contact details here are explicitly labeled as
- * placeholders and use non-real-looking values — this is a structural
- * placeholder, not a stand-in that could be mistaken for a real filing.
- * Practice area links reuse the existing placeholder content (see
- * src/content/practice-areas.ts) rather than inventing new services.
- */
-export function Footer() {
+export function Footer({ locale, d, office }: { locale: string; d: Dictionary; office: { address: string; phone: string; email: string } }) {
+  const l = (p: string) => `/${locale}${p}`;
   const year = new Date().getFullYear();
-
   return (
-    <footer className="bg-surface-dark text-ink-dark">
-      <PageContainer className="flex flex-col gap-16 py-24">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
-          <div className="flex flex-col gap-4 md:col-span-2">
-            <Wordmark onDark />
-            <p className="max-w-sm font-body text-ui text-ink-dark/70">
-              A premium, technology-oriented law firm. Structural
-              placeholder positioning statement — not final copy.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <span className="font-mono text-ui-sm tracking-mono uppercase text-accent-on-dark">
-              Navigation
-            </span>
-            <ul className="flex flex-col gap-2">
-              {primaryNav.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="font-body text-ui text-ink-dark/85 hover:text-accent-on-dark"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <span className="font-mono text-ui-sm tracking-mono uppercase text-accent-on-dark">
-              Practice areas
-            </span>
-            <ul className="flex flex-col gap-2">
-              {practiceAreas.map((area) => (
-                <li key={area.slug}>
-                  <Link
-                    href={`/practice-areas/${area.slug}`}
-                    className="font-body text-ui text-ink-dark/85 hover:text-accent-on-dark"
-                  >
-                    {area.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <footer className="relative mt-32 overflow-hidden border-t border-line bg-night-2">
+      <div aria-hidden className="pointer-events-none absolute -bottom-24 left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-display text-[22vw] font-light uppercase leading-none tracking-[0.1em] text-white/[0.025]" dir="ltr">
+        Mendes
+      </div>
+      <Container className="relative grid gap-14 py-20 md:grid-cols-12">
+        <div className="md:col-span-5">
+          <Wordmark locale={locale} />
+          <p className="mt-6 max-w-sm text-ui leading-relaxed text-ivory-muted">{d.footer.tagline}</p>
+          <p className="mt-8 max-w-md text-ui-sm leading-relaxed text-ivory-muted/70">{d.footer.disclaimer}</p>
         </div>
-
-        <hr className="border-ink-dark/15" />
-
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-          <div className="flex flex-col gap-2">
-            <span className="font-mono text-ui-sm tracking-mono uppercase text-accent-on-dark">
-              Contact — placeholder
-            </span>
-            <p className="font-body text-ui text-ink-dark/70">
-              Placeholder address, City, Country
-            </p>
-            <p className="font-body text-ui text-ink-dark/70">
-              +00 000 000 0000 (placeholder)
-            </p>
-            <p className="font-body text-ui text-ink-dark/70">
-              contact@example.com (placeholder)
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <span className="font-mono text-ui-sm tracking-mono uppercase text-accent-on-dark">
-              Legal
-            </span>
-            <ul className="flex flex-col gap-2">
-              {footerLegalLinks.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="font-body text-ui text-ink-dark/85 hover:text-accent-on-dark"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="md:col-span-2">
+          <p className="label mb-5">{d.footer.explore}</p>
+          <ul className="space-y-3 text-ui text-ivory/80">
+            {[["/about", d.nav.about], ["/practice", d.nav.practice], ["/team", d.nav.team], ["/laws", d.nav.laws], ["/insights", d.nav.insights]].map(([p, t]) => (
+              <li key={p}><Link className="link-grow hover:text-gold-light" href={l(p)}>{t}</Link></li>
+            ))}
+          </ul>
         </div>
-
-        <p className="font-mono text-ui-sm tracking-mono text-ink-dark/50">
-          © {year} Mendes. All rights reserved. Placeholder content — not a
-          real law firm filing.
-        </p>
-      </PageContainer>
+        <div className="md:col-span-2">
+          <p className="label mb-5">{d.footer.clients}</p>
+          <ul className="space-y-3 text-ui text-ivory/80">
+            {[["/booking", d.nav.booking], ["/portal", d.nav.portal], ["/insights/submit", d.insights.submitCta], ["/contact", d.nav.contact]].map(([p, t]) => (
+              <li key={p}><Link className="link-grow hover:text-gold-light" href={l(p)}>{t}</Link></li>
+            ))}
+          </ul>
+        </div>
+        <div className="md:col-span-3">
+          <p className="label mb-5">{d.footer.office}</p>
+          <address className="space-y-3 text-ui not-italic text-ivory/80">
+            <p>{office.address}</p>
+            {office.phone && <p><a className="link-grow hover:text-gold-light" href={`tel:${office.phone.replace(/\s/g, "")}`} dir="ltr">{office.phone}</a></p>}
+            {office.email && <p><a className="link-grow hover:text-gold-light" href={`mailto:${office.email}`}>{office.email}</a></p>}
+          </address>
+        </div>
+      </Container>
+      <div className="hairline" />
+      <Container className="flex flex-col items-center justify-between gap-3 py-7 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-ivory-muted/70 sm:flex-row">
+        <span>© {year} Mendes Law &amp; Consultancy. {d.footer.rights}</span>
+        <span dir="ltr">Kyrenia · North Cyprus · Online</span>
+      </Container>
     </footer>
   );
 }

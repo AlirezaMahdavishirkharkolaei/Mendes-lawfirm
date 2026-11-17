@@ -1,116 +1,64 @@
 /**
- * Mendes design tokens — "The Citation Mark"
+ * Mendes design tokens — "Obsidian & Champagne" (v1.0)
  *
- * This file is the single source of truth for the Mendes brand's raw
- * design values. Change a value here and it propagates everywhere it's
- * used, in Tailwind utilities (bridged via the @theme block in
- * globals.css) and in any plain CSS that references these variables
- * directly.
+ * Single source of truth for brand values. Tailwind utilities read these
+ * through the @theme block in src/app/globals.css (bg-night, text-gold,
+ * font-display …). Change a value here and it propagates everywhere.
  *
- * Do not hardcode these values (hex colors, font stacks, spacing
- * numbers) directly in components — reference the token instead.
- *
- * See docs/DESIGN-SYSTEM.md for the full rationale and usage guide.
+ * Palette: a near-black obsidian base, warm ivory text and a restrained
+ * champagne-gold accent. Gold is reserved for emphasis — hairlines,
+ * marks, focus and primary actions — never large fills, which is what
+ * keeps it reading as luxury rather than decoration.
  */
-
 :root {
-  /* ---------------------------------------------------------------
-   * Color — approved Mendes Design System Proposal v0.1
-   * Do not introduce additional brand colors. Utility colors (error,
-   * success) may be added later but must stay visually subordinate.
-   * ------------------------------------------------------------- */
-  --mendes-surface: #f1f0ea; /* primary background */
-  --mendes-surface-alt: #e7e5dc; /* secondary background */
-  --mendes-ink: #16181b; /* primary text */
-  --mendes-ink-muted: #5b5c56; /* secondary text */
-  --mendes-border: #d9d7cd; /* hairline border */
-  --mendes-accent: #1c3a2e; /* primary accent */
-  --mendes-accent-hover: #143025; /* accent hover/active */
-  --mendes-surface-dark: #101312; /* dark surface (e.g. footer) */
-  --mendes-ink-dark: #f1f0ea; /* text on dark surface */
-  --mendes-accent-on-dark: #7fa08f; /* accent on dark surface */
+  /* Surfaces */
+  --mendes-night: #0a0a0c;          /* page background */
+  --mendes-night-2: #111114;        /* raised surface */
+  --mendes-night-3: #18181c;        /* cards / inputs */
+  --mendes-paper: #f4efe6;          /* ivory editorial sections */
+  --mendes-paper-2: #ebe3d4;
 
-  /* ---------------------------------------------------------------
-   * Typography — font stacks
-   *
-   * These are system-font fallback stacks, NOT the final typefaces.
-   * The approved typefaces are Fraunces (display), IBM Plex Sans
-   * (heading/body/UI), and IBM Plex Mono (technical/citation layer),
-   * self-hosted via next/font/local — see src/lib/fonts.ts and
-   * src/assets/fonts/README.md for exactly how to activate them once
-   * the licensed font files are added to the repository. Until then,
-   * the site renders correctly and readably with these fallbacks, so
-   * nothing here depends on a runtime Google Fonts request.
-   * ------------------------------------------------------------- */
-  --mendes-font-display: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  --mendes-font-body:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
-  --mendes-font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
-    monospace;
+  /* Text */
+  --mendes-ivory: #f2ece1;          /* primary text on dark */
+  --mendes-ivory-muted: #a59d8f;    /* secondary text on dark */
+  --mendes-ink: #16140f;            /* text on paper */
+  --mendes-ink-muted: #6a6253;
 
-  /* ---------------------------------------------------------------
-   * Typography — fluid type scale
-   *
-   * Values are approximate design targets per the approved spec.
-   * clamp() is used for the two sizes that need to move meaningfully
-   * between mobile and desktop (display, h1); the rest are stable
-   * enough across breakpoints to stay fixed.
-   * ------------------------------------------------------------- */
-  --mendes-text-ui-sm: 0.75rem; /* 12px */
-  --mendes-text-ui: 0.875rem; /* 14px */
-  --mendes-text-body: 1rem; /* 16px */
-  --mendes-text-lead: 1.125rem; /* 18px */
-  --mendes-text-h3: 1.375rem; /* 22px */
-  --mendes-text-h2: 1.75rem; /* 28px */
-  --mendes-text-h1: clamp(2rem, 1.6rem + 2vw, 2.5rem); /* ~32px -> 40px */
-  --mendes-text-display: clamp(2.5rem, 1.1rem + 4.5vw, 4.5rem); /* ~40px -> 72px */
+  /* Accent */
+  --mendes-gold: #c9a96a;
+  --mendes-gold-light: #e8d5a8;
+  --mendes-gold-deep: #8a6d3b;
+  --mendes-line: rgba(201, 169, 106, 0.18);
+  --mendes-line-strong: rgba(201, 169, 106, 0.42);
 
-  /* ---------------------------------------------------------------
-   * Layout
-   * ------------------------------------------------------------- */
-  --mendes-width-structural: 1280px;
-  --mendes-width-reading: 720px;
-  --mendes-gutter-desktop: 24px;
-  --mendes-margin-desktop: 80px;
-  --mendes-margin-tablet: 48px;
-  --mendes-margin-mobile: 20px;
-  --mendes-section-space-desktop-min: 96px;
-  --mendes-section-space-desktop-max: 160px;
-  --mendes-section-space-mobile: 64px;
+  /* Utility (kept subordinate to the brand palette) */
+  --mendes-success: #7fae8f;
+  --mendes-danger: #d98476;
+  --mendes-warning: #d8b46a;
 
-  /* ---------------------------------------------------------------
-   * Motion
-   *
-   * Reveal is the default scroll-in animation; hover is for
-   * interactive-state transitions. See src/lib/motion.ts and
-   * src/components/ui/Reveal.tsx for how these are consumed, and
-   * docs/DESIGN-SYSTEM.md for the progressive-enhancement contract.
-   * ------------------------------------------------------------- */
-  --mendes-duration-reveal: 450ms;
-  --mendes-duration-hover: 175ms;
-  --mendes-stagger-step: 70ms;
-  --mendes-reveal-distance: 12px;
+  /* Typography */
+  --mendes-font-display: "Cormorant Garamond Variable", "Cormorant Garamond", ui-serif, Georgia, serif;
+  --mendes-font-body: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mendes-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mendes-font-rtl: "Vazirmatn Variable", Vazirmatn, Tahoma, sans-serif;
+
+  --mendes-text-ui-sm: 0.75rem;
+  --mendes-text-ui: 0.875rem;
+  --mendes-text-body: 1rem;
+  --mendes-text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --mendes-text-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+  --mendes-text-h2: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  --mendes-text-h1: clamp(2.5rem, 1.8rem + 3vw, 4.5rem);
+  --mendes-text-display: clamp(3rem, 1.6rem + 6vw, 7.5rem);
+
+  /* Layout */
+  --mendes-width-structural: 1320px;
+  --mendes-width-reading: 740px;
+
+  /* Motion */
   --mendes-ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --mendes-ease-silk: cubic-bezier(0.65, 0, 0.35, 1);
+  --mendes-duration-hover: 220ms;
+  --mendes-duration-reveal: 900ms;
+  --mendes-reveal-distance: 28px;
 }
-
-/*
- * Spacing note: the approved scale (4, 8, 12, 16, 24, 32, 48, 64, 96,
- * 128, 192) is NOT redefined as separate tokens here. Tailwind's v4
- * default spacing scale is dynamic and based on a 4px unit
- * (--spacing: 0.25rem), so it already lands exactly on every value in
- * the approved scale via its ordinary numeric utilities:
- *
- *   4px  = p-1 / gap-1 / etc.      48px  = p-12
- *   8px  = p-2                     64px  = p-16
- *   12px = p-3                     96px  = p-24
- *   16px = p-4                     128px = p-32
- *   24px = p-6                     192px = p-48
- *   32px = p-8
- *
- * Use these utilities (or the equivalent arbitrary value referencing
- * the same multiple of 4px) rather than one-off pixel values, so the
- * scale stays centralized in Tailwind's own token rather than a
- * parallel system. See docs/DESIGN-SYSTEM.md for the full table.
- */
