@@ -1,0 +1,64 @@
+/**
+ * Mendes design tokens — "Obsidian & Champagne" (v1.0)
+ *
+ * Single source of truth for brand values. Tailwind utilities read these
+ * through the @theme block in src/app/globals.css (bg-night, text-gold,
+ * font-display …). Change a value here and it propagates everywhere.
+ *
+ * Palette: a near-black obsidian base, warm ivory text and a restrained
+ * champagne-gold accent. Gold is reserved for emphasis — hairlines,
+ * marks, focus and primary actions — never large fills, which is what
+ * keeps it reading as luxury rather than decoration.
+ */
+:root {
+  /* Surfaces */
+  --mendes-night: #0a0a0c;          /* page background */
+  --mendes-night-2: #111114;        /* raised surface */
+  --mendes-night-3: #18181c;        /* cards / inputs */
+  --mendes-paper: #f4efe6;          /* ivory editorial sections */
+  --mendes-paper-2: #ebe3d4;
+
+  /* Text */
+  --mendes-ivory: #f2ece1;          /* primary text on dark */
+  --mendes-ivory-muted: #a59d8f;    /* secondary text on dark */
+  --mendes-ink: #16140f;            /* text on paper */
+  --mendes-ink-muted: #6a6253;
+
+  /* Accent */
+  --mendes-gold: #c9a96a;
+  --mendes-gold-light: #e8d5a8;
+  --mendes-gold-deep: #8a6d3b;
+  --mendes-line: rgba(201, 169, 106, 0.18);
+  --mendes-line-strong: rgba(201, 169, 106, 0.42);
+
+  /* Utility (kept subordinate to the brand palette) */
+  --mendes-success: #7fae8f;
+  --mendes-danger: #d98476;
+  --mendes-warning: #d8b46a;
+
+  /* Typography */
+  --mendes-font-display: "Cormorant Garamond Variable", "Cormorant Garamond", ui-serif, Georgia, serif;
+  --mendes-font-body: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mendes-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mendes-font-rtl: "Vazirmatn Variable", Vazirmatn, Tahoma, sans-serif;
+
+  --mendes-text-ui-sm: 0.75rem;
+  --mendes-text-ui: 0.875rem;
+  --mendes-text-body: 1rem;
+  --mendes-text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --mendes-text-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+  --mendes-text-h2: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  --mendes-text-h1: clamp(2.5rem, 1.8rem + 3vw, 4.5rem);
+  --mendes-text-display: clamp(3rem, 1.6rem + 6vw, 7.5rem);
+
+  /* Layout */
+  --mendes-width-structural: 1320px;
+  --mendes-width-reading: 740px;
+
+  /* Motion */
+  --mendes-ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --mendes-ease-silk: cubic-bezier(0.65, 0, 0.35, 1);
+  --mendes-duration-hover: 220ms;
+  --mendes-duration-reveal: 900ms;
+  --mendes-reveal-distance: 28px;
+}
