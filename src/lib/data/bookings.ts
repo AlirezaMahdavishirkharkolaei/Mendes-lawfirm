@@ -105,7 +105,7 @@ export async function getBooking(id: string): Promise<Booking | null> {
 
 async function decisionLinks(id: string) {
   const token = await signPayload({ b: id, p: "booking" }, 14 * 86400);
-  const base = siteUrl();
+  const base = (await siteUrl());
   return {
     approve: `${base}/booking/decision?t=${encodeURIComponent(token)}&a=approve`,
     reject: `${base}/booking/decision?t=${encodeURIComponent(token)}&a=reject`,
@@ -180,7 +180,7 @@ export async function decideBooking(
   const updated = (await getBooking(id))!;
   const locale = asLocale(updated.locale) as Locale;
   const settings = await getSettings();
-  const rebook = `${siteUrl()}/${locale}/booking?topic=${encodeURIComponent(updated.topic)}`;
+  const rebook = `${(await siteUrl())}/${locale}/booking?topic=${encodeURIComponent(updated.topic)}`;
   await sendMail({ to: updated.email, ...bookingDecision(updated, locale, status === "approved", rebook, settings.firm_name || "Mendes") });
   await audit(actor, `booking.${status}`, "booking", id, { note: note ?? null });
   return { ok: true, booking: updated };

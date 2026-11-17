@@ -109,7 +109,7 @@ export async function cancelBooking(form: FormData) {
 async function invite(userId: string, email: string, locale: Locale) {
   const token = await issueUserToken(userId, "invite", 7 * 24);
   const settings = await getSettings();
-  const url = `${siteUrl()}/${locale}/portal/reset?t=${encodeURIComponent(token)}`;
+  const url = `${(await siteUrl())}/${locale}/portal/reset?t=${encodeURIComponent(token)}`;
   return sendMail({ to: email, ...accountLink(locale, "invite", url, settings.firm_name || "Mendes") });
 }
 

@@ -43,7 +43,7 @@ export default defineConfig({
       EMAIL: bindings.sendEmail(),
 
       // First-run defaults (overridable in Admin → Settings).
-      SITE_URL: bindings.text("http://localhost:3001"),
+      SITE_URL: bindings.text(""),
       MAIL_FROM: bindings.text("no-reply@mendes.law"),
       AI_PROVIDER: bindings.text("gemini"),
       AI_MODEL: bindings.text("gemini-2.5-flash"),

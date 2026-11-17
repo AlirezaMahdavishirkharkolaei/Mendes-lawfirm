@@ -93,7 +93,7 @@ export async function requestReset(_: FormState, form: FormData): Promise<FormSt
   if (user) {
     const token = await issueUserToken(user.id, "reset", 2);
     const settings = await getSettings();
-    const url = `${siteUrl()}/${asLocale(user.locale || locale)}/portal/reset?t=${encodeURIComponent(token)}`;
+    const url = `${(await siteUrl())}/${asLocale(user.locale || locale)}/portal/reset?t=${encodeURIComponent(token)}`;
     await sendMail({ to: user.email, ...accountLink(asLocale(user.locale || locale), "reset", url, settings.firm_name || "Mendes") });
   }
   return { ok: true };

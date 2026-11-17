@@ -134,7 +134,7 @@ async function draftFor(prospect: Prospect, history: OutreachMessage[]): Promise
   const settings = await getSettings();
   const firm = settings.firm_name || "Mendes Law & Consultancy";
   const language = localeMeta[asLocale(prospect.language)].label;
-  const booking = `${siteUrl()}/${asLocale(prospect.language)}/booking?topic=${prospect.interest === "construction" ? "construction" : prospect.interest === "investment" ? "investment" : "company_formation"}`;
+  const booking = `${(await siteUrl())}/${asLocale(prospect.language)}/booking?topic=${prospect.interest === "construction" ? "construction" : prospect.interest === "investment" ? "investment" : "company_formation"}`;
   const isReply = history.some((m) => m.direction === "inbound");
 
   const system = `You write business-development e-mails for ${firm}, a law and consultancy firm in Kyrenia (Girne), North Cyprus (TRNC).
@@ -214,7 +214,7 @@ export async function approveAndSend(messageId: string, actor: string, edits?: {
   const subject = edits?.subject?.trim() || message.subject;
   const body = edits?.body?.trim() || message.body;
   const token = await signPayload({ e: prospect.email, p: "unsub" }, 3650 * 86400);
-  const unsub = `${siteUrl()}/unsubscribe?t=${encodeURIComponent(token)}`;
+  const unsub = `${(await siteUrl())}/unsubscribe?t=${encodeURIComponent(token)}`;
   const firm = settings.firm_name || "Mendes";
   const replyTo = emailList(settings.outreach_reply_to || settings.boss_email)[0];
   const html = shell({
@@ -230,7 +230,7 @@ export async function approveAndSend(messageId: string, actor: string, edits?: {
     text: `${body}\n\n—\nUnsubscribe: ${unsub}`,
     replyTo,
     headers: {
-      "List-Unsubscribe": `<${siteUrl()}/api/unsubscribe?t=${encodeURIComponent(token)}>`,
+      "List-Unsubscribe": `<${(await siteUrl())}/api/unsubscribe?t=${encodeURIComponent(token)}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
   });

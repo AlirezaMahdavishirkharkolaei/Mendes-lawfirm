@@ -134,7 +134,7 @@ export async function reviewArticle(id: string, status: ArticleStatus, note: str
   if (!author) return;
   const locale = asLocale(author.locale);
   const settings = await getSettings();
-  const url = `${siteUrl()}/${asLocale(article.locale)}/insights/${article.slug}`;
+  const url = `${(await siteUrl())}/${asLocale(article.locale)}/insights/${article.slug}`;
   await sendMail({ to: author.email, ...articleDecision(locale, status, article.title, url, note, settings.firm_name || "Mendes") });
 }
 

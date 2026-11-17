@@ -41,7 +41,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
   if (preview && !(isStaff(user) || user?.id === a.author_id)) notFound();
   if (!preview) after(() => incrementViews(a.id));
 
-  const url = `${siteUrl()}/${asLocale(a.locale)}/insights/${a.slug}`;
+  const url = `${(await siteUrl())}/${asLocale(a.locale)}/insights/${a.slug}`;
   const year = (a.published_at ?? a.created_at).slice(0, 4);
   const citation = `${a.author_name}, “${a.title}” (${year}) Mendes Insights. Available at: ${url}`;
   const dir = localeMeta[asLocale(a.locale)].dir;

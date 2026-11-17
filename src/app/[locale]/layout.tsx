@@ -10,7 +10,7 @@ import { siteUrl } from "@/lib/env";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale, d } = await pageContext(params);
-  const base = siteUrl();
+  const base = (await siteUrl());
   return {
     metadataBase: new URL(base),
     title: { default: d.meta.title, template: `%s · Mendes` },

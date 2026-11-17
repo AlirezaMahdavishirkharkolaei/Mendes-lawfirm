@@ -137,7 +137,7 @@ ${table([
   row("AI assistant conversations", `${stats.chatSessions} (referred to a specialist: ${stats.chatReferrals})`),
   row("Student articles", `${stats.articlesSubmitted} submitted · ${stats.articlesPublished} published`),
 ])}
-<p style="margin-top:24px"><a href="${esc(siteUrl())}/admin/outreach" style="color:#8a6d3b">Open the outreach dashboard</a></p>`,
+<p style="margin-top:24px"><a href="${esc((await siteUrl()))}/admin/outreach" style="color:#8a6d3b">Open the outreach dashboard</a></p>`,
   });
 
   if (recipients.length) {

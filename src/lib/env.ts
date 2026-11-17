@@ -16,6 +16,27 @@ export function optional(name: string): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
-export function siteUrl(): string {
-  return (optional("SITE_URL") ?? "http://localhost:3001").replace(/\/$/, "");
+/**
+ * Public base URL used in e-mail links. Order: the SITE_URL binding (when
+ * set to a real domain) → the host of the current request (remembered in
+ * settings so cron jobs can use it too) → the remembered value → localhost.
+ */
+export async function siteUrl(): Promise<string> {
+  const configured = optional("SITE_URL");
+  if (configured && !configured.includes("localhost")) return configured.replace(/\/$/, "");
+  const { getSetting, setSettings } = await import("@/lib/settings");
+  try {
+    const { headers } = await import("next/headers");
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    if (host) {
+      const proto = host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https";
+      const url = `${proto}://${host}`;
+      if (proto === "https" && (await getSetting("site_url")) !== url) await setSettings({ site_url: url });
+      return url;
+    }
+  } catch {
+    /* no request (cron / email handler) */
+  }
+  return (await getSetting("site_url")) || configured || "http://localhost:3001";
 }

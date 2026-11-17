@@ -1,6 +1,5 @@
 import "server-only";
 import { headers } from "next/headers";
-import { siteUrl } from "@/lib/env";
 
 export async function clientIp(): Promise<string | null> {
   const h = await headers();
@@ -14,7 +13,7 @@ export function sameOrigin(request: Request): boolean {
   try {
     const o = new URL(origin);
     const self = new URL(request.url);
-    return o.host === self.host || o.host === new URL(siteUrl()).host;
+    return o.host === self.host || o.host === request.headers.get("x-forwarded-host");
   } catch {
     return false;
   }

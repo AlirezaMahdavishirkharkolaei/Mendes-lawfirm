@@ -179,7 +179,7 @@ export async function notifyCaseParty(caseId: string, actorId: string, title: st
   if (!target) return;
   const locale = asLocale(target.locale);
   const settings = await getSettings();
-  const url = `${siteUrl()}/${locale}/portal/cases/${c.id}`;
+  const url = `${(await siteUrl())}/${locale}/portal/cases/${c.id}`;
   await sendMail({ to: target.email, ...caseUpdate(locale, c.reference, title, url, settings.firm_name || "Mendes") });
 }
 

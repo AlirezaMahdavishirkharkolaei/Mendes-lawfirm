@@ -29,7 +29,7 @@ Changing `AUTH_SECRET` invalidates outstanding booking-decision and unsubscribe 
 
 ## 4. Site URL
 
-Set the `SITE_URL` text binding in `cloudflare.config.ts` to the public URL (e.g. `https://mendes.law`). It is used in every e-mail link.
+E-mail links use the site's public address. It's detected automatically from incoming requests and remembered for cron jobs. To force a custom domain, set the `SITE_URL` text binding in `cloudflare.config.ts` (e.g. `https://mendes.law`).
 
 ## 5. Deploy
 
