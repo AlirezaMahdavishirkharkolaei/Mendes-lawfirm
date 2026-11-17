@@ -29,7 +29,7 @@ export async function submitArticleAction(_: SubmitState, form: FormData): Promi
 
   const file = form.get("attachment");
   const attachment = file instanceof File && file.size > 0 ? file : null;
-  if (attachment && (attachment.type !== "application/pdf" || attachment.size > 15 * 1024 * 1024)) return { error: "attachment" };
+  if (attachment && (attachment.type !== "application/pdf" || attachment.size > 10 * 1024 * 1024)) return { error: "attachment" };
 
   await submitArticle({
     authorId: user.id,

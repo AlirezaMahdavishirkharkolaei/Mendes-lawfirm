@@ -236,10 +236,10 @@ const ru: Dictionary = {
     documents: "Документы",
     noDocuments: "Документов пока нет.",
     uploadTitle: "Загрузить документ",
-    uploadHint: "PDF, Word, изображения или таблицы · до 20 МБ",
+    uploadHint: "PDF, Word, изображения или таблицы · до 10 МБ",
     note: "Комментарий (необязательно)",
     uploadedBy: "Загрузил(а)",
-    fileTooLarge: "Файл больше 20 МБ.",
+    fileTooLarge: "Файл больше 10 МБ.",
     fileType: "Этот тип файла не разрешён.",
     uploaded: "Документ загружен.",
     statuses: {

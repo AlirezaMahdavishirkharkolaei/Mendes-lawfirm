@@ -236,10 +236,10 @@ const fa: Dictionary = {
     documents: "مدارک",
     noDocuments: "هنوز مدرکی بارگذاری نشده است.",
     uploadTitle: "بارگذاری مدرک",
-    uploadHint: "PDF، Word، تصویر یا صفحه‌گسترده · حداکثر ۲۰ مگابایت",
+    uploadHint: "PDF، Word، تصویر یا صفحه‌گسترده · حداکثر ۱۰ مگابایت",
     note: "یادداشت (اختیاری)",
     uploadedBy: "بارگذاری توسط",
-    fileTooLarge: "حجم فایل بیش از ۲۰ مگابایت است.",
+    fileTooLarge: "حجم فایل بیش از ۱۰ مگابایت است.",
     fileType: "این نوع فایل مجاز نیست.",
     uploaded: "مدرک بارگذاری شد.",
     statuses: {

@@ -236,10 +236,10 @@ const ar: Dictionary = {
     documents: "المستندات",
     noDocuments: "لا توجد مستندات بعد.",
     uploadTitle: "رفع مستند",
-    uploadHint: "PDF أو Word أو صور أو جداول · حتى 20 ميغابايت",
+    uploadHint: "PDF أو Word أو صور أو جداول · حتى 10 ميغابايت",
     note: "ملاحظة (اختياري)",
     uploadedBy: "رفعه",
-    fileTooLarge: "حجم الملف أكبر من 20 ميغابايت.",
+    fileTooLarge: "حجم الملف أكبر من 10 ميغابايت.",
     fileType: "نوع الملف هذا غير مسموح.",
     uploaded: "تم رفع المستند.",
     statuses: {

@@ -234,10 +234,10 @@ const en = {
     documents: "Documents",
     noDocuments: "No documents yet.",
     uploadTitle: "Upload a document",
-    uploadHint: "PDF, Word, images or spreadsheets · max 20 MB",
+    uploadHint: "PDF, Word, images or spreadsheets · max 10 MB",
     note: "Note (optional)",
     uploadedBy: "Uploaded by",
-    fileTooLarge: "The file is larger than 20 MB.",
+    fileTooLarge: "The file is larger than 10 MB.",
     fileType: "This file type isn't allowed.",
     uploaded: "Document uploaded.",
     statuses: {

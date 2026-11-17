@@ -1,5 +1,5 @@
 import { currentUser } from "@/lib/auth";
-import { getEnv } from "@/lib/env";
+import { getFile } from "@/lib/storage";
 import { canAccessCase, getCase, getDocument } from "@/lib/data/cases";
 import { audit } from "@/lib/settings";
 
@@ -11,7 +11,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!doc) return new Response("Not found", { status: 404 });
   const c = await getCase(doc.case_id);
   if (!c || !canAccessCase(user, c)) return new Response("Not found", { status: 404 });
-  const obj = await getEnv().FILES.get(doc.r2_key);
+  const obj = await getFile(doc.r2_key);
   if (!obj) return new Response("Not found", { status: 404 });
   await audit(user.email, "document.downloaded", "document", doc.id);
   const inline = doc.mime_type === "application/pdf" || doc.mime_type.startsWith("image/");

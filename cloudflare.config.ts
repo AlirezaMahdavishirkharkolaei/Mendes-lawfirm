@@ -39,7 +39,8 @@ export default defineConfig({
       IMAGES: bindings.images(),
 
       DB: bindings.d1({ name: "mendes-db" }),
-      FILES: bindings.r2({ name: "mendes-files" }),
+      // Optional: enable R2 on the account and uncomment for larger uploads.
+      // FILES: bindings.r2({ name: "mendes-files" }),
       EMAIL: bindings.sendEmail(),
 
       // First-run defaults (overridable in Admin → Settings).

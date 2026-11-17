@@ -1,6 +1,7 @@
 import "server-only";
 import { all, db, now, uuid } from "@/lib/db";
-import { getEnv, siteUrl } from "@/lib/env";
+import { siteUrl } from "@/lib/env";
+import { maxUploadBytes, putFile } from "@/lib/storage";
 import { asLocale } from "@/lib/i18n/config";
 import type { User } from "@/lib/auth";
 import { getSettings, audit } from "@/lib/settings";
@@ -184,7 +185,6 @@ export async function notifyCaseParty(caseId: string, actorId: string, title: st
 }
 
 // ── Documents (R2) ────────────────────────────────────────────────────
-export const MAX_UPLOAD = 20 * 1024 * 1024;
 const ALLOWED = new Map<string, string>([
   ["application/pdf", "pdf"],
   ["application/msword", "doc"],
@@ -199,7 +199,7 @@ const ALLOWED = new Map<string, string>([
 ]);
 
 export function checkUpload(file: File): "ok" | "size" | "type" {
-  if (file.size <= 0 || file.size > MAX_UPLOAD) return "size";
+  if (file.size <= 0 || file.size > maxUploadBytes()) return "size";
   if (!ALLOWED.has(file.type)) return "type";
   return "ok";
 }
@@ -212,10 +212,7 @@ export async function storeDocument(input: { caseId: string; file: File; uploade
   const id = uuid();
   const ext = ALLOWED.get(input.file.type) ?? "bin";
   const key = `cases/${input.caseId}/${id}.${ext}`;
-  await getEnv().FILES.put(key, input.file.stream(), {
-    httpMetadata: { contentType: input.file.type },
-    customMetadata: { caseId: input.caseId, uploader: input.uploaderId },
-  });
+  await putFile(key, input.file, input.file.type);
   const database = await db();
   await database
     .prepare("INSERT INTO documents (id, case_id, uploader_id, filename, r2_key, mime_type, size_bytes, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")

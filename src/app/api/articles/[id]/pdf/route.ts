@@ -1,4 +1,4 @@
-import { getEnv } from "@/lib/env";
+import { getFile } from "@/lib/storage";
 import { getArticle } from "@/lib/data/articles";
 import { currentUser, isStaff } from "@/lib/auth";
 
@@ -9,7 +9,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const user = await currentUser();
     if (!(isStaff(user) || user?.id === a.author_id)) return new Response("Not found", { status: 404 });
   }
-  const obj = await getEnv().FILES.get(a.attachment_key);
+  const obj = await getFile(a.attachment_key);
   if (!obj) return new Response("Not found", { status: 404 });
   return new Response(obj.body, {
     headers: {

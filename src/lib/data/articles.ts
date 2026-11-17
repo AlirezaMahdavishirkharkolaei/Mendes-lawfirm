@@ -1,6 +1,7 @@
 import "server-only";
 import { all, db, now, parseJson, uuid } from "@/lib/db";
-import { getEnv, siteUrl } from "@/lib/env";
+import { siteUrl } from "@/lib/env";
+import { putFile } from "@/lib/storage";
 import { slugify } from "@/lib/auth";
 import { asLocale } from "@/lib/i18n/config";
 import { getSettings, audit } from "@/lib/settings";
@@ -102,7 +103,7 @@ export async function submitArticle(input: {
   if (input.attachment && input.attachment.size > 0) {
     key = `articles/${id}.pdf`;
     name = input.attachment.name.slice(-140);
-    await getEnv().FILES.put(key, input.attachment.stream(), { httpMetadata: { contentType: "application/pdf" } });
+    await putFile(key, input.attachment, "application/pdf");
   }
   const stamp = now();
   await database

@@ -6,7 +6,9 @@
 npx cf auth login                  # or set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID
 ```
 
-The D1 database (`mendes-db`) and R2 bucket (`mendes-files`) declared in `cloudflare.config.ts` are provisioned automatically on first deploy. The schema migrates itself on the first request.
+The D1 database (`mendes-db`) is provisioned automatically on first deploy, and the schema migrates itself on the first request.
+
+**File storage.** By default, uploaded documents and article PDFs are stored in D1 in 1 MB chunks (max 10 MB per file), so no payment method is needed. For larger files, enable R2 on the account, create a bucket named `mendes-files`, and uncomment the `FILES` binding in `cloudflare.config.ts`. Uploads then go to R2 with a 20 MB limit. Files already stored in D1 stay there.
 
 ## 2. E-mail (Cloudflare Email Service)
 

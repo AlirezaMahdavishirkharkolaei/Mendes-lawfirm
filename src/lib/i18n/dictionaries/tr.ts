@@ -236,10 +236,10 @@ const tr: Dictionary = {
     documents: "Belgeler",
     noDocuments: "Henüz belge yok.",
     uploadTitle: "Belge yükle",
-    uploadHint: "PDF, Word, görsel veya tablo · en fazla 20 MB",
+    uploadHint: "PDF, Word, görsel veya tablo · en fazla 10 MB",
     note: "Not (isteğe bağlı)",
     uploadedBy: "Yükleyen",
-    fileTooLarge: "Dosya 20 MB'tan büyük.",
+    fileTooLarge: "Dosya 10 MB'tan büyük.",
     fileType: "Bu dosya türüne izin verilmiyor.",
     uploaded: "Belge yüklendi.",
     statuses: {
