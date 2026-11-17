@@ -1,5 +1,6 @@
 import "server-only";
-import { getEnv } from "@/lib/env";
+import { optional } from "@/lib/env";
+import { db } from "@/lib/db";
 
 const enc = new TextEncoder();
 
@@ -59,11 +60,28 @@ export async function verifyPassword(password: string, stored: string): Promise<
 }
 
 // ── Signed tokens (HMAC-SHA256) for e-mail action links ────────────────
+let generated: string | null = null;
+
+/**
+ * Signing secret: the AUTH_SECRET Worker secret when set (recommended),
+ * otherwise a random secret generated once and kept in D1, so the
+ * platform works straight after the first deploy.
+ */
+async function authSecret(): Promise<string> {
+  const configured = optional("AUTH_SECRET");
+  if (configured && configured.length >= 16) return configured;
+  if (generated) return generated;
+  const database = await db();
+  const row = await database.prepare("SELECT value FROM settings WHERE key = '_auth_secret'").first<{ value: string }>();
+  if (row?.value) return (generated = row.value);
+  const fresh = randomToken(48);
+  await database.prepare("INSERT OR IGNORE INTO settings (key, value, updated_at) VALUES ('_auth_secret', ?, ?)").bind(fresh, new Date().toISOString()).run();
+  const stored = await database.prepare("SELECT value FROM settings WHERE key = '_auth_secret'").first<{ value: string }>();
+  return (generated = stored?.value ?? fresh);
+}
+
 async function hmacKey(): Promise<CryptoKey> {
-  const secret = getEnv().AUTH_SECRET;
-  if (!secret || secret.length < 16) {
-    throw new Error("AUTH_SECRET is missing or too short (min 16 chars).");
-  }
+  const secret = await authSecret();
   return crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
     "sign",
     "verify",
@@ -97,5 +115,5 @@ export async function verifyPayload<T extends Record<string, unknown>>(token: st
 
 export async function hashIp(ip: string | null): Promise<string | null> {
   if (!ip) return null;
-  return (await sha256(`${ip}|${getEnv().AUTH_SECRET ?? ""}`)).slice(0, 22);
+  return (await sha256(`${ip}|${await authSecret()}`)).slice(0, 22);
 }

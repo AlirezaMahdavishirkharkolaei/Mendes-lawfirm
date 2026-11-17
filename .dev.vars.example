@@ -1,5 +1,6 @@
 # Copy to .dev.vars for local development (never commit .dev.vars).
 # In production set these with: npx cf workers secrets put <NAME>
+# Optional — generated automatically if unset:
 AUTH_SECRET=change-me-to-a-long-random-string-at-least-32-chars
 ADMIN_SETUP_TOKEN=choose-a-one-time-setup-token
 GEMINI_API_KEY=

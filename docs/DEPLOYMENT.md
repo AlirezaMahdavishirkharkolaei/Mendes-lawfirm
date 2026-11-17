@@ -20,12 +20,14 @@ Email Service is meant for transactional mail. Outreach is low-volume, one-to-on
 
 ## 3. Secrets
 
-```bash
-npx cf workers secrets put AUTH_SECRET          # long random string (32+ chars)
-npx cf workers secrets put ADMIN_SETUP_TOKEN    # one-time token for /admin/setup
-npx cf workers secrets put GEMINI_API_KEY       # free key from aistudio.google.com
-# optional: ANTHROPIC_API_KEY, GROQ_API_KEY, OPENAI_API_KEY
-```
+Secrets aren't needed for the deploy itself. Add them **after** the first successful deploy, in the dashboard (Workers & Pages → mendes → Settings → Variables and Secrets → Add → type *Secret*) or with `npx cf workers secrets put <NAME>`:
+
+| Secret | Required? | Purpose |
+|---|---|---|
+| `ADMIN_SETUP_TOKEN` | once | Lets you create the first admin at `/admin/setup` |
+| `GEMINI_API_KEY` | for AI | Free key from aistudio.google.com. Without it the chatbot uses keyword mode and no AI text is generated |
+| `AUTH_SECRET` | optional | Signs e-mail links. If it isn't set, a random one is generated and kept in D1 |
+| `ANTHROPIC_API_KEY` / `GROQ_API_KEY` / `OPENAI_API_KEY` | optional | Alternative AI providers |
 
 Changing `AUTH_SECRET` invalidates outstanding booking-decision and unsubscribe links.
 

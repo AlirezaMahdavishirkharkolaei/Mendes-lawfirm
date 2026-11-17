@@ -49,10 +49,12 @@ export default defineConfig({
       AI_PROVIDER: bindings.text("gemini"),
       AI_MODEL: bindings.text("gemini-2.5-flash"),
 
-      // Secrets — set with `cf workers secrets put` (see docs/DEPLOYMENT.md).
-      AUTH_SECRET: bindings.secret(),
-      ADMIN_SETUP_TOKEN: bindings.secret(),
-      GEMINI_API_KEY: bindings.secret(),
+      // Secrets are NOT declared here so a deploy never blocks on them.
+      // Set them after the first deploy in the dashboard (Settings →
+      // Variables and Secrets) or with `cf workers secrets put`:
+      //   ADMIN_SETUP_TOKEN — needed once, to create the first admin
+      //   GEMINI_API_KEY    — enables the AI features
+      //   AUTH_SECRET       — optional; one is generated and stored in D1 if unset
     },
   }),
 });

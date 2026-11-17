@@ -3,7 +3,8 @@ import { db, now, uuid } from "@/lib/db";
 
 export async function getSettings(): Promise<Record<string, string>> {
   const database = await db();
-  const rows = await database.prepare("SELECT key, value FROM settings").all<{ key: string; value: string }>();
+  // Keys starting with "_" are internal (e.g. the generated signing secret) and never leave the server.
+  const rows = await database.prepare("SELECT key, value FROM settings WHERE key NOT LIKE '\\_%' ESCAPE '\\'").all<{ key: string; value: string }>();
   return Object.fromEntries((rows.results ?? []).map((r) => [r.key, r.value]));
 }
 

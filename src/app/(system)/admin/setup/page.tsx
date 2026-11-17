@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { optional } from "@/lib/env";
+import { Notice } from "@/components/ui/misc";
 import { SystemPanel } from "@/components/system/Panel";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { Field, Input } from "@/components/ui/fields";
@@ -14,6 +16,11 @@ export default async function Setup() {
   return (
     <SystemPanel title="First-run setup" label="Mendes · Create admin">
       <p className="mb-8 text-ui text-ivory-muted">Enter the <code className="text-gold">ADMIN_SETUP_TOKEN</code> secret configured for this deployment. This page disappears once an admin exists.</p>
+      {!optional("ADMIN_SETUP_TOKEN") && (
+        <Notice tone="danger" className="mb-8">
+          ADMIN_SETUP_TOKEN is not set yet. In the Cloudflare dashboard open Workers &amp; Pages → mendes → Settings → Variables and Secrets, add a secret named ADMIN_SETUP_TOKEN, then reload this page.
+        </Notice>
+      )}
       <ActionForm action={setupAdmin}>
         <Field label="Setup token" htmlFor="token"><Input id="token" name="token" type="password" required /></Field>
         <Field label="Full name" htmlFor="name"><Input id="name" name="name" required /></Field>
