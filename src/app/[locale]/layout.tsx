@@ -6,6 +6,7 @@ import { pageContext } from "@/lib/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { Intro, introBootScript } from "@/components/layout/Intro";
 import { siteUrl } from "@/lib/env";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -36,8 +37,10 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     { href: l("/insights"), label: d.nav.insights },
   ];
   return (
-    <html lang={meta.htmlLang} dir={meta.dir} className="h-full">
+    <html lang={meta.htmlLang} dir={meta.dir} className="h-full" suppressHydrationWarning>
       <body className="grain flex min-h-full flex-col antialiased">
+        <script dangerouslySetInnerHTML={{ __html: introBootScript }} />
+        <Intro tagline={d.home.eyebrow} />
         <a href="#main" className="skip-link">{d.common.readMore} ↓</a>
         {settings.announcement && (
           <div className="relative z-[51] bg-gradient-to-r from-gold-deep via-gold to-gold-deep px-4 py-2 text-center text-ui-sm font-medium text-night">{settings.announcement}</div>

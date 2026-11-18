@@ -1,10 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
-@import "@fontsource-variable/cormorant-garamond/wght.css";
-@import "@fontsource-variable/cormorant-garamond/wght-italic.css";
-@import "@fontsource-variable/inter/wght.css";
-@import "@fontsource-variable/vazirmatn/wght.css";
-@import "@fontsource/ibm-plex-mono/400.css";
+@import "../styles/fonts.css";
 
 @theme inline {
   --color-night: var(--mendes-night);
@@ -315,6 +311,76 @@ html[dir="rtl"] .link-grow { background-position: 100% 100%; }
 /* Skip link */
 .skip-link { position: absolute; left: 12px; top: -60px; z-index: 100; padding: 10px 18px; background: var(--color-gold); color: var(--color-night); font-weight: 600; transition: top 200ms; }
 .skip-link:focus { top: 12px; }
+
+/* ── Opening sequence (components/layout/Intro.tsx) ─────────────────── */
+.intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; cursor: pointer; overflow: hidden; }
+html[data-intro="seen"] .intro { display: none; }
+.intro-curtain {
+  position: absolute; left: 0; right: 0; height: 50.5%;
+  background: radial-gradient(120% 90% at 50% 100%, #15130f 0%, #0a0a0c 60%);
+  animation: intro-open 1.1s var(--ease-silk) 2.35s forwards;
+}
+.intro-curtain-top { top: 0; transform-origin: top; }
+.intro-curtain-bottom { bottom: 0; background: radial-gradient(120% 90% at 50% 0%, #15130f 0%, #0a0a0c 60%); animation-name: intro-open-down; }
+@keyframes intro-open { to { transform: translateY(-101%); } }
+@keyframes intro-open-down { to { transform: translateY(101%); } }
+
+.intro-stage { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; animation: intro-stage-out 0.9s var(--ease-editorial) 2.2s forwards; }
+@keyframes intro-stage-out { to { opacity: 0; transform: scale(1.12); filter: blur(6px); } }
+
+.intro-glow {
+  position: absolute; left: 50%; top: 38%; width: 70vmin; height: 70vmin; translate: -50% -50%;
+  background: radial-gradient(circle, rgba(201, 169, 106, 0.28) 0%, rgba(201, 169, 106, 0.08) 35%, transparent 65%);
+  opacity: 0; animation: intro-glow 2.2s var(--ease-silk) 0.1s forwards;
+}
+@keyframes intro-glow { 0% { opacity: 0; scale: 0.6; } 60% { opacity: 1; scale: 1.05; } 100% { opacity: 0.85; scale: 1; } }
+
+.intro-line { position: absolute; top: 38%; height: 1px; width: 34vw; background: linear-gradient(90deg, transparent, #c9a96a); transform: scaleX(0); animation: intro-line 1.4s var(--ease-silk) 0.25s forwards; }
+.intro-line-start { right: calc(50% + 21vmin); transform-origin: right; }
+.intro-line-end { left: calc(50% + 21vmin); transform-origin: left; background: linear-gradient(90deg, #c9a96a, transparent); }
+@keyframes intro-line { to { transform: scaleX(1); } }
+
+.intro-crest-wrap { position: relative; width: 40vmin; height: 40vmin; max-width: 340px; max-height: 340px; display: grid; place-items: center; }
+.intro-ring { position: absolute; inset: -8%; width: 116%; height: 116%; rotate: -90deg; }
+.intro-ring-outer { stroke-dasharray: 1; stroke-dashoffset: 1; animation: intro-draw 1.6s var(--ease-silk) 0.7s forwards; }
+.intro-ring-inner { opacity: 0; transform-origin: center; animation: intro-fade 1s ease 1.2s forwards, orbit 40s linear infinite; }
+@keyframes intro-draw { to { stroke-dashoffset: 0; } }
+@keyframes intro-fade { to { opacity: 0.8; } }
+
+.intro-crest {
+  height: 100%; width: auto; object-fit: contain;
+  opacity: 0; filter: blur(14px) brightness(0.6);
+  animation: intro-crest 1.5s var(--ease-editorial) 0.35s forwards;
+}
+@keyframes intro-crest {
+  0% { opacity: 0; transform: scale(0.82); filter: blur(14px) brightness(0.6); }
+  60% { opacity: 1; filter: blur(0) brightness(1.25) drop-shadow(0 0 30px rgba(201, 169, 106, 0.55)); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0) brightness(1) drop-shadow(0 0 22px rgba(201, 169, 106, 0.35)); }
+}
+.intro-sheen {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 244, 214, 0.55) 50%, transparent 65%);
+  background-size: 250% 100%; background-position: 130% 0;
+  -webkit-mask: url("/brand/mendes-crest.webp") center / contain no-repeat; mask: url("/brand/mendes-crest.webp") center / contain no-repeat;
+  animation: intro-sheen 1.3s var(--ease-silk) 1.35s forwards;
+}
+@keyframes intro-sheen { to { background-position: -30% 0; } }
+
+.intro-name { margin-top: 2.2rem; display: flex; gap: 0.08em; font-family: var(--font-display); font-weight: 300; font-size: clamp(2rem, 1.4rem + 3vw, 3.6rem); color: var(--color-ivory); }
+.intro-name span { opacity: 0; letter-spacing: 0.6em; transform: translateY(14px); filter: blur(8px); animation: intro-letter 0.9s var(--ease-editorial) forwards; }
+.intro-name span:last-child { letter-spacing: 0; }
+@keyframes intro-letter { to { opacity: 1; transform: none; filter: none; letter-spacing: 0.32em; } }
+.intro-tagline { margin-top: 1rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--color-gold); opacity: 0; animation: intro-fade 0.8s ease 1.85s forwards; }
+html[dir="rtl"] .intro-tagline { letter-spacing: 0; font-family: var(--mendes-font-rtl); font-size: 0.8rem; }
+
+/* Skip: everything resolves and the curtains open immediately */
+.intro-skip .intro-stage { animation: intro-stage-out 0.5s var(--ease-editorial) forwards; }
+.intro-skip .intro-curtain { animation-delay: 0s; animation-duration: 0.7s; }
+
+/* While the intro plays, hold back the page's own entrance animations */
+html[data-intro="playing"] .words > span > span { animation-delay: calc(var(--i) * 70ms + 2700ms); }
+html[data-intro="playing"] .page-enter { animation-delay: 2.45s; }
+html[data-intro="playing"] .fade-in { animation-delay: 2.9s; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

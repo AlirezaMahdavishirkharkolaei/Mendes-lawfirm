@@ -47,7 +47,7 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
   return <div className={`rounded-[4px] border border-line bg-night-2/80 backdrop-blur-sm ${className}`}>{children}</div>;
 }
 
-export function Seal({ className = "", bare = false }: { className?: string; bare?: boolean }) {
+function SealRing({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 200" className={className} aria-hidden direction="ltr" style={{ direction: "ltr" }}>
       <defs>
@@ -65,7 +65,23 @@ export function Seal({ className = "", bare = false }: { className?: string; bar
           <textPath href="#seal-circle">MENDES · LAW · CONSULTANCY · NORTH CYPRUS · </textPath>
         </text>
       </g>
-      {!bare && <text x="100" y="118" textAnchor="middle" fill="url(#seal-gold)" fontSize="58" fontFamily="Cormorant Garamond Variable, Georgia, serif" fontStyle="italic">§</text>}
     </svg>
+  );
+}
+
+/**
+ * The firm's seal: a slowly orbiting text ring with the Mendes crest in
+ * the centre. `bare` renders only the ring (for layouts that place the
+ * crest themselves).
+ */
+export function Seal({ className = "", bare = false }: { className?: string; bare?: boolean }) {
+  if (bare) return <SealRing className={className} />;
+  const positioned = /\b(absolute|fixed)\b/.test(className);
+  return (
+    <span aria-hidden className={`${positioned ? "" : "relative"} block ${className}`}>
+      <SealRing className="absolute inset-0 h-full w-full" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/mendes-crest.webp" alt="" className="crest-float absolute inset-0 m-auto h-[58%] w-auto object-contain" />
+    </span>
   );
 }

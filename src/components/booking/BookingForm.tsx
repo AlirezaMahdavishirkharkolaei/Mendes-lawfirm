@@ -50,9 +50,9 @@ export function BookingForm({
   if (state.ok) {
     return (
       <div className="fade-in relative overflow-hidden rounded-[6px] border border-gold/40 bg-gradient-to-br from-gold/[0.12] to-night-2 p-12 text-center">
-        <Seal className="mx-auto h-32 w-32" />
+        <Seal className="mx-auto h-44 w-44" />
         <h2 className="mt-8 font-display text-h2 font-light">{d.booking.successTitle}</h2>
-        <p className="mx-auto mt-6 max-w-lg text-ivory/80">{d.booking.successBody.replace("{email}", state.email ?? "")}</p>
+        <p className="mx-auto mt-6 max-w-lg break-words text-ivory/80 [overflow-wrap:anywhere]">{d.booking.successBody.replace("{email}", state.email ?? "")}</p>
       </div>
     );
   }
