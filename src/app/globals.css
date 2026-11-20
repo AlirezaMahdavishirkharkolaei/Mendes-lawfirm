@@ -336,8 +336,8 @@ html[data-intro="seen"] .intro { display: none; }
 @keyframes intro-glow { 0% { opacity: 0; scale: 0.6; } 60% { opacity: 1; scale: 1.05; } 100% { opacity: 0.85; scale: 1; } }
 
 .intro-line { position: absolute; top: 38%; height: 1px; width: 34vw; background: linear-gradient(90deg, transparent, #c9a96a); transform: scaleX(0); animation: intro-line 1.4s var(--ease-silk) 0.25s forwards; }
-.intro-line-start { right: calc(50% + 21vmin); transform-origin: right; }
-.intro-line-end { left: calc(50% + 21vmin); transform-origin: left; background: linear-gradient(90deg, #c9a96a, transparent); }
+.intro-line-start { right: calc(50% + min(24vmin, 200px)); transform-origin: right; }
+.intro-line-end { left: calc(50% + min(24vmin, 200px)); transform-origin: left; background: linear-gradient(90deg, #c9a96a, transparent); }
 @keyframes intro-line { to { transform: scaleX(1); } }
 
 .intro-crest-wrap { position: relative; width: 40vmin; height: 40vmin; max-width: 340px; max-height: 340px; display: grid; place-items: center; }
@@ -348,7 +348,8 @@ html[data-intro="seen"] .intro { display: none; }
 @keyframes intro-fade { to { opacity: 0.8; } }
 
 .intro-crest {
-  height: 100%; width: auto; object-fit: contain;
+  /* Sized to sit inside the inner ring (r≈52% of the box), with breathing room, so the ring draws around it. */
+  position: absolute; inset: 0; margin: auto; height: 72%; width: auto; object-fit: contain;
   opacity: 0; filter: blur(14px) brightness(0.6);
   animation: intro-crest 1.5s var(--ease-editorial) 0.35s forwards;
 }
@@ -358,7 +359,7 @@ html[data-intro="seen"] .intro { display: none; }
   100% { opacity: 1; transform: scale(1); filter: blur(0) brightness(1) drop-shadow(0 0 22px rgba(201, 169, 106, 0.35)); }
 }
 .intro-sheen {
-  position: absolute; inset: 0; pointer-events: none;
+  position: absolute; inset: 14%; pointer-events: none;
   background: linear-gradient(105deg, transparent 35%, rgba(255, 244, 214, 0.55) 50%, transparent 65%);
   background-size: 250% 100%; background-position: 130% 0;
   -webkit-mask: url("/brand/mendes-crest.webp") center / contain no-repeat; mask: url("/brand/mendes-crest.webp") center / contain no-repeat;
