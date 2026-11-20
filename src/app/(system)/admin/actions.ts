@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { forgetAll } from "@/lib/memo";
 import { z } from "zod";
 import {
   checkCredentials,
@@ -36,6 +37,14 @@ import { generate, AiUnavailable } from "@/lib/ai/provider";
 import { TOPIC_KEYS } from "@/lib/topics";
 import { slugify } from "@/lib/auth";
 
+/** Revalidates pages and drops this isolate's cached reads so edits show at once. */
+function refresh(...paths: string[]) {
+  forgetAll();
+  for (const path of paths) revalidatePath(path);
+  // Public pages are edge-cached for a few minutes; an admin edit refreshes them all.
+  revalidatePath("/", "layout");
+}
+
 export type AdminState = { ok?: boolean; error?: string; message?: string };
 
 async function guard(roles: Role[] = ["admin"]): Promise<User> {
@@ -46,7 +55,7 @@ async function guard(roles: Role[] = ["admin"]): Promise<User> {
 
 const str = (f: FormData, k: string, max = 2000) => String(f.get(k) ?? "").trim().slice(0, max);
 const done = (path: string, message = "Saved"): AdminState => {
-  revalidatePath(path);
+  refresh(path);
   return { ok: true, message };
 };
 
@@ -70,6 +79,7 @@ export async function setAdminLang(form: FormData) {
   await guard(["admin", "lawyer"]);
   const { cookies } = await import("next/headers");
   (await cookies()).set("mendes_admin_lang", form.get("lang") === "tr" ? "tr" : "en", { path: "/", maxAge: 31536000, sameSite: "lax", secure: true, httpOnly: true });
+  forgetAll();
   revalidatePath("/admin", "layout");
 }
 
@@ -117,8 +127,8 @@ export async function setupAdmin(_: AdminState, form: FormData): Promise<AdminSt
 export async function decideBookingAdmin(form: FormData) {
   const user = await guard(["admin", "lawyer"]);
   await decideBooking(str(form, "id"), form.get("decision") === "approve" ? "approve" : "reject", user.email, str(form, "note", 1000));
-  revalidatePath("/admin/bookings");
-  revalidatePath("/admin");
+  refresh("/admin/bookings");
+  refresh("/admin");
 }
 
 export async function cancelBooking(form: FormData) {
@@ -126,7 +136,7 @@ export async function cancelBooking(form: FormData) {
   const database = await db();
   await database.prepare("UPDATE bookings SET status = 'cancelled', decided_by = ?, decided_at = ? WHERE id = ?").bind(user.email, now(), str(form, "id")).run();
   await audit(user.email, "booking.cancelled", "booking", str(form, "id"));
-  revalidatePath("/admin/bookings");
+  refresh("/admin/bookings");
 }
 
 // ── Users ─────────────────────────────────────────────────────────────
@@ -165,7 +175,7 @@ export async function updateUserAdmin(form: FormData) {
     if (!active) await database.prepare("DELETE FROM sessions WHERE user_id = ?").bind(id).run();
     await audit(actor.email, "user.updated", "user", id, { role, active });
   }
-  revalidatePath("/admin/users");
+  refresh("/admin/users");
 }
 
 export async function resendInvite(form: FormData) {
@@ -176,7 +186,7 @@ export async function resendInvite(form: FormData) {
     await invite(u.id, u.email, asLocale(u.locale));
     await audit(actor.email, "user.invite_resent", "user", u.id);
   }
-  revalidatePath("/admin/users");
+  refresh("/admin/users");
 }
 
 // ── Cases ─────────────────────────────────────────────────────────────
@@ -420,21 +430,21 @@ export async function importProspects(_: AdminState, form: FormData): Promise<Ad
 export async function draftProspect(form: FormData) {
   const actor = await guard();
   await createDraft(str(form, "id"), actor.email);
-  revalidatePath("/admin/outreach");
-  revalidatePath(`/admin/outreach/${str(form, "id")}`);
+  refresh("/admin/outreach");
+  refresh(`/admin/outreach/${str(form, "id")}`);
 }
 
 export async function sendDraft(_: AdminState, form: FormData): Promise<AdminState> {
   const actor = await guard();
   const r = await approveAndSend(str(form, "id"), actor.email, { subject: str(form, "subject", 200), body: str(form, "body", 6000) });
-  revalidatePath("/admin/outreach");
+  refresh("/admin/outreach");
   return r.ok ? { ok: true, message: "Sent." } : { error: r.error };
 }
 
 export async function discardDraftAdmin(form: FormData) {
   const actor = await guard();
   await discardDraft(str(form, "id"), actor.email);
-  revalidatePath("/admin/outreach");
+  refresh("/admin/outreach");
 }
 
 export async function updateProspectStatus(form: FormData) {
@@ -446,7 +456,7 @@ export async function updateProspectStatus(form: FormData) {
     await database.prepare("UPDATE prospects SET status = ?, notes = COALESCE(NULLIF(?, ''), notes), updated_at = ? WHERE id = ?").bind(status, str(form, "notes", 2000), now(), id).run();
     if (status === "meeting" || status === "declined") await audit(actor.email, `prospect.${status}`, "prospect", id);
   }
-  revalidatePath(`/admin/outreach/${id}`);
+  refresh(`/admin/outreach/${id}`);
 }
 
 export async function logInboundReply(_: AdminState, form: FormData): Promise<AdminState> {

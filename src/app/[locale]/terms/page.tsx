@@ -3,6 +3,9 @@ import { pageContext } from "@/lib/site";
 import { terms } from "@/content/legal";
 import { LegalPage } from "@/components/legal/LegalPage";
 
+// Same for every visitor: served from the edge cache, refreshed in the background.
+export const revalidate = 3600;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await pageContext(params);
   return { title: terms[locale].title, description: terms[locale].intro.slice(0, 160) };

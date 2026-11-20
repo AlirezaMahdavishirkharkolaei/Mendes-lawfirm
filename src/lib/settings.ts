@@ -1,11 +1,15 @@
 import "server-only";
+import { forgetAll, memo } from "@/lib/memo";
 import { db, now, uuid } from "@/lib/db";
 
 export async function getSettings(): Promise<Record<string, string>> {
-  const database = await db();
-  // Keys starting with "_" are internal (e.g. the generated signing secret) and never leave the server.
-  const rows = await database.prepare("SELECT key, value FROM settings WHERE key NOT LIKE '\\_%' ESCAPE '\\'").all<{ key: string; value: string }>();
-  return Object.fromEntries((rows.results ?? []).map((r) => [r.key, r.value]));
+  const settings = await memo("settings", 30_000, async () => {
+    const database = await db();
+    // Keys starting with "_" are internal (e.g. the generated signing secret) and never leave the server.
+    const rows = await database.prepare("SELECT key, value FROM settings WHERE key NOT LIKE '\\_%' ESCAPE '\\'").all<{ key: string; value: string }>();
+    return Object.fromEntries((rows.results ?? []).map((r) => [r.key, r.value]));
+  });
+  return { ...settings };
 }
 
 export async function getSetting(key: string, fallback = ""): Promise<string> {
@@ -26,6 +30,7 @@ export async function setSettings(values: Record<string, string>): Promise<void>
         .bind(key, value, stamp),
     ),
   );
+  forgetAll();
 }
 
 export function emailList(value: string | undefined): string[] {

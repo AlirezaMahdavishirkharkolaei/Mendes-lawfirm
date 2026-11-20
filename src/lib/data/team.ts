@@ -1,4 +1,5 @@
 import "server-only";
+import { memo } from "@/lib/memo";
 import { all, db, parseJson } from "@/lib/db";
 import { pick, type Locale } from "@/lib/i18n/config";
 
@@ -59,12 +60,12 @@ function map(row: TeamMemberRow): TeamMember {
 }
 
 export async function listTeam(includeInactive = false): Promise<TeamMember[]> {
-  const database = await db();
-  const rows = await all<TeamMemberRow>(
-    database.prepare(
-      `SELECT * FROM team_members ${includeInactive ? "" : "WHERE is_active = 1"} ORDER BY sort_order, name`,
-    ),
-  );
+  const rows = await memo(`team:${includeInactive}`, 60_000, async () => {
+    const database = await db();
+    return all<TeamMemberRow>(
+      database.prepare(`SELECT * FROM team_members ${includeInactive ? "" : "WHERE is_active = 1"} ORDER BY sort_order, name`),
+    );
+  });
   return rows.map(map);
 }
 

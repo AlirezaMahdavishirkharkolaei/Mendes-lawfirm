@@ -46,7 +46,8 @@ export default defineConfig({
       EMAIL: bindings.sendEmail(),
 
       // First-run defaults (overridable in Admin → Settings).
-      SITE_URL: bindings.text(""),
+      // Public origin, used in e-mail links and metadata. Change it when a custom domain is added.
+      SITE_URL: bindings.text("https://mendes.lawyer-alirezamahdavi.workers.dev"),
       MAIL_FROM: bindings.text("no-reply@mendes.law"),
       AI_PROVIDER: bindings.text("gemini"),
       AI_MODEL: bindings.text("gemini-2.5-flash"),

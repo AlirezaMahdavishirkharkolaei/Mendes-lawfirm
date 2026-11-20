@@ -16,6 +16,9 @@ import { Spotlight } from "@/components/ui/Spotlight";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading, Seal } from "@/components/ui/misc";
 
+// Same for every visitor: served from the edge cache, refreshed in the background.
+export const revalidate = 120;
+
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale, d, l } = await pageContext(params);
   const [team, laws, articles] = await Promise.all([listTeam(), listLaws(), listArticles({ status: "published", limit: 3 })]);

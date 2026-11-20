@@ -28,15 +28,19 @@ function statements(sql: string): string[] {
 }
 
 export async function migrate(database: D1Database): Promise<void> {
-  await database
-    .prepare(
-      "CREATE TABLE IF NOT EXISTS d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TEXT DEFAULT CURRENT_TIMESTAMP)",
-    )
-    .run();
-  const applied = await database
-    .prepare("SELECT name FROM d1_migrations")
-    .all<{ name: string }>();
-  const done = new Set((applied.results ?? []).map((r) => r.name));
+  // One read on the warm path; the table is only created on a brand-new database.
+  let applied: { name: string }[];
+  try {
+    applied = (await database.prepare("SELECT name FROM d1_migrations").all<{ name: string }>()).results ?? [];
+  } catch {
+    await database
+      .prepare(
+        "CREATE TABLE IF NOT EXISTS d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TEXT DEFAULT CURRENT_TIMESTAMP)",
+      )
+      .run();
+    applied = [];
+  }
+  const done = new Set(applied.map((r) => r.name));
 
   let changed = false;
   for (const migration of MIGRATIONS) {

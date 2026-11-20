@@ -1,4 +1,5 @@
 import "server-only";
+import { memo } from "@/lib/memo";
 import { all, db, now, parseJson } from "@/lib/db";
 import { localeMeta, locales, pick, type Locale } from "@/lib/i18n/config";
 import { AiUnavailable, generateJson } from "@/lib/ai/provider";
@@ -51,10 +52,10 @@ function map(r: LawRow): Law {
 }
 
 export async function listLaws(includeDrafts = false): Promise<Law[]> {
-  const database = await db();
-  const rows = await all<LawRow>(
-    database.prepare(`SELECT * FROM laws ${includeDrafts ? "" : "WHERE status = 'published'"} ORDER BY sort_order, slug`),
-  );
+  const rows = await memo(`laws:${includeDrafts}`, 60_000, async () => {
+    const database = await db();
+    return all<LawRow>(database.prepare(`SELECT * FROM laws ${includeDrafts ? "" : "WHERE status = 'published'"} ORDER BY sort_order, slug`));
+  });
   return rows.map(map);
 }
 

@@ -8,6 +8,9 @@ import { formatDate } from "@/lib/i18n/format";
 import { Container, Badge } from "@/components/ui/misc";
 import { initials } from "@/components/sections/cards";
 
+// Same for every visitor: served from the edge cache, refreshed in the background.
+export const revalidate = 300;
+
 type Params = Promise<{ locale: string; slug: string }>;
 
 async function author(slug: string) {

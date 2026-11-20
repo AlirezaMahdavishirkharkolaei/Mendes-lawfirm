@@ -6,6 +6,9 @@ import { PageHero } from "@/components/sections/PageHero";
 import { LawsBrowser } from "@/components/laws/LawsBrowser";
 import { Container, Notice } from "@/components/ui/misc";
 
+// Same for every visitor: served from the edge cache, refreshed in the background.
+export const revalidate = 300;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { d } = await pageContext(params);
   return { title: d.laws.title, description: d.laws.lead };

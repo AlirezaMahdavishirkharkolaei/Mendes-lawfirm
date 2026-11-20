@@ -1,4 +1,5 @@
 import "server-only";
+import { memo } from "@/lib/memo";
 import { cache } from "react";
 import { db } from "@/lib/db";
 import type { Locale } from "./config";
@@ -49,12 +50,15 @@ export function staticDictionary(locale: Locale): Dictionary {
 export const getDictionary = cache(async (locale: Locale): Promise<Dictionary> => {
   const base = structuredClone(dictionaries[locale] ?? en);
   try {
-    const database = await db();
-    const rows = await database
-      .prepare("SELECT key, value FROM content_overrides WHERE locale = ?")
-      .bind(locale)
-      .all<{ key: string; value: string }>();
-    for (const row of rows.results ?? []) setPath(base as unknown as Record<string, unknown>, row.key, row.value);
+    const rows = await memo(`overrides:${locale}`, 30_000, async () => {
+      const database = await db();
+      const result = await database
+        .prepare("SELECT key, value FROM content_overrides WHERE locale = ?")
+        .bind(locale)
+        .all<{ key: string; value: string }>();
+      return result.results ?? [];
+    });
+    for (const row of rows) setPath(base as unknown as Record<string, unknown>, row.key, row.value);
   } catch (error) {
     console.error("content overrides unavailable", error);
   }

@@ -5,6 +5,9 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Container, Seal } from "@/components/ui/misc";
 import { ButtonLink } from "@/components/ui/Button";
 
+// Same for every visitor: served from the edge cache, refreshed in the background.
+export const revalidate = 600;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { d } = await pageContext(params);
   return { title: d.about.title, description: d.about.lead };
