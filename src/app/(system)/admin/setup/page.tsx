@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { optional } from "@/lib/env";
 import { Notice } from "@/components/ui/misc";
@@ -12,10 +11,10 @@ export const dynamic = "force-dynamic";
 
 export default async function Setup() {
   const database = await db();
-  if (await database.prepare("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").first()) redirect("/admin/login");
+  const hasAdmin = !!(await database.prepare("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").first());
   return (
-    <SystemPanel title="First-run setup" label="Mendes · Create admin">
-      <p className="mb-8 text-ui text-ivory-muted">Enter the <code className="text-gold">ADMIN_SETUP_TOKEN</code> secret configured for this deployment. This page disappears once an admin exists.</p>
+    <SystemPanel title={hasAdmin ? "Reset admin access" : "First-run setup"} label="Mendes · Create admin">
+      <p className="mb-8 text-ui text-ivory-muted">Enter the <code className="text-gold">ADMIN_SETUP_TOKEN</code> secret configured for this deployment. {hasAdmin ? " An admin already exists: enter that admin's e-mail and a new password to reset it." : " This creates the first admin account."}</p>
       {!optional("ADMIN_SETUP_TOKEN") && (
         <Notice tone="danger" className="mb-8">
           ADMIN_SETUP_TOKEN is not set yet. In the Cloudflare dashboard open Workers &amp; Pages → mendes → Settings → Variables and Secrets, add a secret named ADMIN_SETUP_TOKEN, then reload this page.

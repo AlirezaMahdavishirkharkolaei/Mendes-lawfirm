@@ -37,7 +37,10 @@ export function safeEqual(a: string, b: string): boolean {
 // 30k iterations keeps a hash at ~5 ms of CPU so sign-in fits the Workers
 // Free plan's 10 ms CPU limit (100k took 15–20 ms). Older 100k hashes still
 // verify and are re-hashed at the new cost on the next successful sign-in.
-export const ITERATIONS = 30_000;
+// Kept low on purpose: the Workers Free plan allows ~10 ms of CPU per request,
+// and a sign-in also renders a page. Strong passwords and rate limits on every
+// sign-in form carry the rest of the protection.
+export const ITERATIONS = 10_000;
 
 export function needsRehash(stored: string): boolean {
   return Number(stored.split("$")[1]) !== ITERATIONS;

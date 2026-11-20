@@ -11,6 +11,7 @@ import {
   getUserByEmail,
   issueUserToken,
   randomPassword,
+  setPassword,
   startSession,
   type Role,
   type User,
@@ -79,20 +80,35 @@ export async function adminLogout() {
 
 /** First-run: create the first admin, protected by ADMIN_SETUP_TOKEN. */
 export async function setupAdmin(_: AdminState, form: FormData): Promise<AdminState> {
-  const database = await db();
-  const existing = await database.prepare("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").first();
-  if (existing) return { error: "An admin already exists. Sign in instead." };
+  if (!(await rateLimit(`setup:${await clientIp()}`, 10, 3600))) return { error: "Too many attempts. Wait an hour and try again." };
   // Trim both sides: a stray space or newline pasted into the dashboard is a common cause of "invalid token".
   const expected = (optional("ADMIN_SETUP_TOKEN") ?? "").trim();
   if (!expected) return { error: "ADMIN_SETUP_TOKEN is not set yet. Add it in Cloudflare → mendes → Settings → Variables and Secrets, then try again." };
-  if (!safeEqual(str(form, "token", 300), expected)) return { error: "Invalid setup token. It must match the ADMIN_SETUP_TOKEN secret exactly, including capital letters." };
+  if (!safeEqual(str(form, "token", 300).trim(), expected)) return { error: "Invalid setup token. It must match the ADMIN_SETUP_TOKEN secret exactly, including capital letters." };
   const parsed = z
     .object({ name: z.string().min(2), email: z.string().email(), password: z.string().min(12) })
     .safeParse({ name: str(form, "name"), email: str(form, "email").toLowerCase(), password: String(form.get("password") ?? "") });
   if (!parsed.success) return { error: "Name, valid e-mail and a password of at least 12 characters are required." };
-  const user = await createUser({ ...parsed.data, role: "admin" });
-  await startSession(user.id);
-  await audit(user.email, "admin.setup");
+
+  const database = await db();
+  const hasAdmin = !!(await database.prepare("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").first());
+  const existing = await getUserByEmail(parsed.data.email);
+  let userId: string;
+  if (existing) {
+    // Same token also recovers access: resets the password of an existing admin
+    // (or promotes the account when no admin exists yet).
+    if (existing.role !== "admin" && hasAdmin) return { error: "An admin already exists. Enter that admin's e-mail to reset its password." };
+    await setPassword(existing.id, parsed.data.password);
+    await database.prepare("UPDATE users SET role = 'admin', name = ?, is_active = 1 WHERE id = ?").bind(parsed.data.name, existing.id).run();
+    userId = existing.id;
+    await audit(existing.email, hasAdmin ? "admin.password_reset" : "admin.setup");
+  } else {
+    if (hasAdmin) return { error: "An admin already exists. Enter that admin's e-mail to reset its password." };
+    const user = await createUser({ ...parsed.data, role: "admin" });
+    userId = user.id;
+    await audit(user.email, "admin.setup");
+  }
+  await startSession(userId);
   redirect("/admin");
 }
 
