@@ -46,6 +46,12 @@ export function BookingForm({
   const fmtMon = useMemo(() => new Intl.DateTimeFormat(intl, { month: "short", timeZone: "UTC" }), [intl]);
   const fmtTime = useMemo(() => new Intl.DateTimeFormat(intl, { hour: "2-digit", minute: "2-digit", timeZone }), [intl, timeZone]);
   const fmtFull = useMemo(() => new Intl.DateTimeFormat(intl, { dateStyle: "full", timeStyle: "short", timeZone }), [intl, timeZone]);
+  // The visitor's own time zone — resolved in the browser only.
+  const [userTz] = useState(() => (typeof window === "undefined" ? "" : Intl.DateTimeFormat().resolvedOptions().timeZone));
+  const sameOffset = (iso: string) => {
+    const opts = { hour: "2-digit", minute: "2-digit", hourCycle: "h23" } as const;
+    return new Intl.DateTimeFormat("en", { ...opts, timeZone }).format(new Date(iso)) === new Intl.DateTimeFormat("en", { ...opts, timeZone: userTz || timeZone }).format(new Date(iso));
+  };
 
   if (state.ok) {
     return (
@@ -73,6 +79,7 @@ export function BookingForm({
     >
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="slot" value={slot ?? ""} />
+      <input type="hidden" name="client_tz" value={userTz} suppressHydrationWarning />
       <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
       {state.error && <Notice tone="danger">{state.error === "slot" ? d.booking.errorSlot : d.common.error}</Notice>}
@@ -126,7 +133,16 @@ export function BookingForm({
             <p className="col-span-full text-ivory-muted">{d.booking.noSlots}</p>
           )}
         </div>
-        {slot && <p className="fade-in mt-5 text-ui text-gold-light">{d.booking.selected}: {fmtFull.format(new Date(slot))}</p>}
+        {slot && (
+          <div className="fade-in mt-5 space-y-1">
+            <p className="text-ui text-gold-light">{d.booking.selected}: {fmtFull.format(new Date(slot))}</p>
+            {userTz && !sameOffset(slot) && (
+              <p className="text-ui-sm text-ivory-muted">
+                {d.booking.yourTime} ({userTz}): {new Intl.DateTimeFormat(intl, { dateStyle: "full", timeStyle: "short", timeZone: userTz }).format(new Date(slot))}
+              </p>
+            )}
+          </div>
+        )}
         {warn && <p className="mt-5 text-ui text-danger">{d.booking.pickFirst}</p>}
       </fieldset>
 
@@ -174,7 +190,7 @@ export function BookingForm({
       </fieldset>
 
       <div className="flex flex-col gap-6 border-t border-line pt-10 md:flex-row md:items-center md:justify-between">
-        <Checkbox name="consent" required label={d.booking.consent} />
+        <Checkbox name="consent" required label={<>{d.booking.consent} <a href={`/${locale}/privacy`} target="_blank" className="text-gold underline underline-offset-4">{d.legal.privacy}</a></>} />
         <SubmitButton pending={d.common.sending} size="lg">{d.booking.send}</SubmitButton>
       </div>
     </form>

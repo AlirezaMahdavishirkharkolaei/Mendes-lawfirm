@@ -20,7 +20,7 @@ import { AiUnavailable, generateJson } from "@/lib/ai/provider";
  * outreach within GDPR / anti-spam expectations for B2B contact.
  */
 
-export const INTERESTS = ["investment", "construction", "company_formation", "other"] as const;
+export { INTERESTS } from "@/lib/csv";
 export const PROSPECT_STATUSES = ["new", "drafted", "contacted", "replied", "meeting", "declined", "unsubscribed"] as const;
 
 export interface Prospect {
@@ -106,22 +106,7 @@ export async function addProspect(input: Omit<Prospect, "id" | "status" | "last_
   return id;
 }
 
-/** Parses CSV: company,country,email,contact_name,sector,interest,language,website,source */
-export function parseProspectCsv(csv: string) {
-  const rows = csv
-    .replace(/\r/g, "")
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-  if (rows.length && /company/i.test(rows[0])) rows.shift();
-  return rows
-    .map((line) => {
-      const cells = line.match(/("([^"]|"")*"|[^,]*)(,|$)/g)?.map((c) => c.replace(/,$/, "").replace(/^"|"$/g, "").replace(/""/g, '"').trim()) ?? [];
-      const [company, country, email, contact_name, sector, interest, language, website, source] = cells;
-      return { company, country, email, contact_name: contact_name || null, sector: sector || null, interest: (INTERESTS as readonly string[]).includes(interest) ? interest : "company_formation", language: language || "en", website: website || null, source: source || "csv import" };
-    })
-    .filter((r) => r.company && r.country && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email ?? ""));
-}
+export { parseProspectCsv } from "@/lib/csv";
 
 const INTEREST_PITCH: Record<string, string> = {
   investment: "investing capital or acquiring assets in North Cyprus (investment incentives, banking, structuring, due diligence)",

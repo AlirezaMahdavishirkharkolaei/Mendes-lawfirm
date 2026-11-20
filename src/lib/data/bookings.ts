@@ -4,9 +4,10 @@ import { all, db, now, uuid } from "@/lib/db";
 import { siteUrl } from "@/lib/env";
 import { asLocale, type Locale } from "@/lib/i18n/config";
 import { emailList, getSettings, audit } from "@/lib/settings";
-import { signPayload } from "@/lib/security/crypto";
+import { signPayload, verifyPayload } from "@/lib/security/crypto";
+import { meetingIcs } from "@/lib/ics";
 import { sendMail } from "@/lib/email/send";
-import { bookingDecision, bookingReceived, bookingRequestToBoss, type BookingLike } from "@/lib/email/templates";
+import { bookingCancelledToBoss, bookingDecision, bookingReceived, bookingReminder, bookingRequestToBoss, type BookingExtras, type BookingLike } from "@/lib/email/templates";
 import { addDays, dayInZone, isoWeekday, zonedToUtc } from "@/lib/time";
 import { TOPIC_KEYS } from "@/lib/topics";
 
@@ -14,6 +15,8 @@ export interface Booking extends BookingLike {
   status: "pending" | "approved" | "rejected" | "cancelled";
   decided_by: string | null;
   decided_at: string | null;
+  reminder_sent_at: string | null;
+  client_tz: string | null;
   user_id: string | null;
   created_at: string;
 }
@@ -94,6 +97,7 @@ export const bookingInput = z.object({
   mode: z.enum(["online", "office"]),
   locale: z.string(),
   consent: z.literal("on"),
+  client_tz: z.string().max(64).optional(),
 });
 
 export type BookingInput = z.infer<typeof bookingInput>;
@@ -110,6 +114,52 @@ async function decisionLinks(id: string) {
     approve: `${base}/booking/decision?t=${encodeURIComponent(token)}&a=approve`,
     reject: `${base}/booking/decision?t=${encodeURIComponent(token)}&a=reject`,
     admin: `${base}/admin/bookings`,
+  };
+}
+
+function validTz(tz: string | undefined): string | null {
+  if (!tz) return null;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: tz });
+    return tz;
+  } catch {
+    return null;
+  }
+}
+
+/** Signed link that lets the client cancel or move their own meeting (no login). */
+export async function manageUrl(b: Pick<Booking, "id" | "locale">): Promise<string> {
+  const token = await signPayload({ b: b.id, p: "manage" }, 120 * 86400);
+  return `${await siteUrl()}/${asLocale(b.locale)}/booking/manage?t=${encodeURIComponent(token)}`;
+}
+
+export async function bookingFromManageToken(token: string): Promise<Booking | null> {
+  const payload = await verifyPayload<{ b: string; p: string }>(token);
+  if (!payload || payload.p !== "manage") return null;
+  return getBooking(payload.b);
+}
+
+async function extrasFor(b: Booking, settings: Record<string, string>): Promise<BookingExtras> {
+  return { manageUrl: await manageUrl(b), meetingLink: settings.meeting_link || undefined, clientTz: b.client_tz };
+}
+
+function invite(b: Booking, settings: Record<string, string>, cancelled = false) {
+  const firm = settings.firm_name || "Mendes";
+  const online = b.meeting_mode !== "office";
+  return {
+    filename: cancelled ? "mendes-meeting-cancelled.ics" : "mendes-meeting.ics",
+    contentType: "text/calendar; charset=utf-8",
+    content: meetingIcs({
+      uid: b.id,
+      start: new Date(b.slot_start),
+      minutes: b.duration_min,
+      title: `${firm} — consultation`,
+      description: online && settings.meeting_link ? `Video link: ${settings.meeting_link}` : `${firm}, ${settings.office_address || "Girne, North Cyprus"}`,
+      location: online ? settings.meeting_link || "Online" : settings.office_address || "Girne, North Cyprus",
+      organizerEmail: emailList(settings.office_email || settings.boss_email)[0],
+      organizerName: firm,
+      cancelled,
+    }),
   };
 }
 
@@ -138,10 +188,10 @@ export async function createBooking(input: BookingInput, extra: { userId?: strin
   const locale = asLocale(input.locale);
   await database
     .prepare(
-      `INSERT INTO bookings (id, name, email, phone, company, topic, message, slot_start, duration_min, meeting_mode, locale, status, user_id, created_at, ip_hash)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
+      `INSERT INTO bookings (id, name, email, phone, company, topic, message, slot_start, duration_min, meeting_mode, locale, status, user_id, created_at, ip_hash, client_tz)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
     )
-    .bind(id, input.name, input.email, input.phone || null, input.company || null, input.topic, input.message, s, cfg.slotMinutes, input.mode, locale, extra.userId ?? null, now(), extra.ipHash ?? null)
+    .bind(id, input.name, input.email, input.phone || null, input.company || null, input.topic, input.message, s, cfg.slotMinutes, input.mode, locale, extra.userId ?? null, now(), extra.ipHash ?? null, validTz(input.client_tz))
     .run();
   const booking = (await getBooking(id))!;
 
@@ -154,7 +204,7 @@ export async function createBooking(input: BookingInput, extra: { userId?: strin
   } else {
     console.warn("booking created but boss_email is not configured (Admin → Settings)");
   }
-  await sendMail({ to: booking.email, ...bookingReceived(booking, locale, firm) });
+  await sendMail({ to: booking.email, ...bookingReceived(booking, locale, firm, await extrasFor(booking, settings)) });
   await audit(input.email, "booking.created", "booking", id, { slot: s, topic: input.topic });
   return { ok: true, booking };
 }
@@ -181,7 +231,12 @@ export async function decideBooking(
   const locale = asLocale(updated.locale) as Locale;
   const settings = await getSettings();
   const rebook = `${(await siteUrl())}/${locale}/booking?topic=${encodeURIComponent(updated.topic)}`;
-  await sendMail({ to: updated.email, ...bookingDecision(updated, locale, status === "approved", rebook, settings.firm_name || "Mendes") });
+  const approved = status === "approved";
+  await sendMail({
+    to: updated.email,
+    ...bookingDecision(updated, locale, approved, rebook, settings.firm_name || "Mendes", await extrasFor(updated, settings)),
+    ...(approved ? { attachments: [invite(updated, settings)] } : {}),
+  });
   await audit(actor, `booking.${status}`, "booking", id, { note: note ?? null });
   return { ok: true, booking: updated };
 }
@@ -203,4 +258,44 @@ export async function listBookings(filter?: { status?: string; email?: string; l
       .prepare(`SELECT * FROM bookings ${where.length ? "WHERE " + where.join(" AND ") : ""} ORDER BY slot_start DESC LIMIT ?`)
       .bind(...binds, filter?.limit ?? 200),
   );
+}
+
+/** Client cancels their own meeting from the signed link in their e-mail. */
+export async function cancelByClient(token: string): Promise<{ ok: boolean; booking: Booking | null }> {
+  const booking = await bookingFromManageToken(token);
+  if (!booking) return { ok: false, booking: null };
+  if (booking.status === "cancelled" || booking.status === "rejected") return { ok: true, booking };
+  const database = await db();
+  await database
+    .prepare("UPDATE bookings SET status = 'cancelled', decided_by = 'client', decided_at = ? WHERE id = ?")
+    .bind(now(), booking.id)
+    .run();
+  const settings = await getSettings();
+  const boss = emailList(settings.boss_email);
+  if (boss.length) {
+    await sendMail({ to: boss, ...bookingCancelledToBoss(booking, settings.firm_name || "Mendes"), attachments: booking.status === "approved" ? [invite(booking, settings, true)] : undefined });
+  }
+  await audit(booking.email, "booking.cancelled_by_client", "booking", booking.id);
+  return { ok: true, booking: (await getBooking(booking.id))! };
+}
+
+/** Daily job: remind clients of approved meetings in the next ~30 hours. */
+export async function sendReminders(): Promise<number> {
+  const database = await db();
+  const due = await all<Booking>(
+    database
+      .prepare("SELECT * FROM bookings WHERE status = 'approved' AND reminder_sent_at IS NULL AND slot_start > ? AND slot_start <= ?")
+      .bind(new Date().toISOString(), new Date(Date.now() + 30 * 3600_000).toISOString()),
+  );
+  if (!due.length) return 0;
+  const settings = await getSettings();
+  let sent = 0;
+  for (const b of due) {
+    const r = await sendMail({ to: b.email, ...bookingReminder(b, asLocale(b.locale), settings.firm_name || "Mendes", await extrasFor(b, settings)) });
+    if (r.ok) {
+      await database.prepare("UPDATE bookings SET reminder_sent_at = ? WHERE id = ?").bind(now(), b.id).run();
+      sent++;
+    }
+  }
+  return sent;
 }

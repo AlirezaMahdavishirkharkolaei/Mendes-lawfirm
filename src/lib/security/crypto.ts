@@ -33,8 +33,15 @@ export function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-// ── Passwords: PBKDF2-SHA256 (100k iterations is the Workers maximum) ──
-const ITERATIONS = 100_000;
+// ── Passwords: PBKDF2-SHA256 ───────────────────────────────────────────
+// 30k iterations keeps a hash at ~5 ms of CPU so sign-in fits the Workers
+// Free plan's 10 ms CPU limit (100k took 15–20 ms). Older 100k hashes still
+// verify and are re-hashed at the new cost on the next successful sign-in.
+export const ITERATIONS = 30_000;
+
+export function needsRehash(stored: string): boolean {
+  return Number(stored.split("$")[1]) !== ITERATIONS;
+}
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = crypto.getRandomValues(new Uint8Array(16));

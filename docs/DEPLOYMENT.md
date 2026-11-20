@@ -10,13 +10,20 @@ The D1 database (`mendes-db`) is provisioned automatically on first deploy, and 
 
 **File storage.** By default, uploaded documents and article PDFs are stored in D1 in 1 MB chunks (max 10 MB per file), so no payment method is needed. For larger files, enable R2 on the account, create a bucket named `mendes-files`, and uncomment the `FILES` binding in `cloudflare.config.ts`. Uploads then go to R2 with a 20 MB limit. Files already stored in D1 stay there.
 
-## 2. E-mail (Cloudflare Email Service)
+## 2. E-mail
 
-1. Add the firm's domain to Cloudflare and enable **Email Sending** for it (Dashboard → Email Service, or `npx wrangler email sending enable your-domain.com`). This sets up SPF/DKIM.
-2. Change the `MAIL_FROM` text binding in `cloudflare.config.ts` to an address on that domain, e.g. `no-reply@your-domain.com`.
-3. *Optional, for automatic outreach replies:* enable **Email Routing** and route the reply-to address (Admin → Settings → "Outreach reply-to address") to the `mendes` Worker. Then add `triggers.email({ addresses: ["outreach@your-domain.com"] })` to `cloudflare.config.ts`.
+The platform sends e-mail through **Resend** when the `RESEND_API_KEY` secret is set, and through Cloudflare Email Service otherwise.
 
-Email Service is meant for transactional mail. Outreach is low-volume, one-to-one, human-approved and capped per day. If volume grows, move it to a dedicated outbound provider.
+**Resend (recommended, free tier):**
+
+1. Create an account at https://resend.com and an API key at https://resend.com/api-keys (permission: *Sending access*).
+2. Add it as a Worker secret named `RESEND_API_KEY` (dashboard → mendes → Settings → Variables and Secrets).
+3. **Test mode:** with no verified domain the sender is `onboarding@resend.dev`, and Resend only delivers to the address the Resend account was created with. That's fine for testing. To e-mail clients and the managing partner, verify the firm's domain in Resend (Domains → Add domain → add the DNS records it shows), then set Admin → Settings → *Sender address* to e.g. `no-reply@your-domain.com`.
+4. Use Admin → Settings → *Send test* to confirm delivery.
+
+**Cloudflare Email Service (alternative):** enable Email Sending for a domain on the account and set *Sender address* to an address on it.
+
+*Optional, automatic logging of outreach replies:* enable Email Routing, route the reply-to address to the `mendes` Worker, and add `triggers.email({ addresses: ["outreach@your-domain.com"] })` to `cloudflare.config.ts`.
 
 ## 3. Secrets
 
@@ -26,6 +33,7 @@ Secrets aren't needed for the deploy itself. Add them **after** the first succes
 |---|---|---|
 | `ADMIN_SETUP_TOKEN` | once | Lets you create the first admin at `/admin/setup` |
 | `GEMINI_API_KEY` | for AI | Free key from aistudio.google.com. Without it the chatbot uses keyword mode and no AI text is generated |
+| `RESEND_API_KEY` | for e-mail | From resend.com/api-keys — see section 2 |
 | `AUTH_SECRET` | optional | Signs e-mail links. If it isn't set, a random one is generated and kept in D1 |
 | `ANTHROPIC_API_KEY` / `GROQ_API_KEY` / `OPENAI_API_KEY` | optional | Alternative AI providers |
 
@@ -54,7 +62,7 @@ npm run deploy
 | Schedule (UTC) | Job |
 |---|---|
 | `0 6 1 * *` | Monthly outreach report to the partners |
-| `0 7 * * *` | AI drafts outreach e-mails/replies for approval; fills missing law explanations |
+| `0 7 * * *` | Reminders for meetings in the next ~30 h; AI outreach drafts for approval; missing law explanations |
 
 To test locally while `npm run dev` is running:
 

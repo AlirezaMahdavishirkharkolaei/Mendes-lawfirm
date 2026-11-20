@@ -46,7 +46,11 @@ export function Footer({ locale, d, office }: { locale: string; d: Dictionary; o
       <div className="hairline" />
       <Container className="flex flex-col items-center justify-between gap-3 py-7 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-ivory-muted/70 sm:flex-row">
         <span>© {year} Mendes Law &amp; Consultancy. {d.footer.rights}</span>
-        <span dir="ltr">Kyrenia · North Cyprus · Online</span>
+        <span className="flex flex-wrap items-center justify-center gap-5">
+          <Link href={l("/privacy")} className="link-grow hover:text-gold-light">{d.legal.privacy}</Link>
+          <Link href={l("/terms")} className="link-grow hover:text-gold-light">{d.legal.terms}</Link>
+          <span dir="ltr">Kyrenia · North Cyprus</span>
+        </span>
       </Container>
     </footer>
   );

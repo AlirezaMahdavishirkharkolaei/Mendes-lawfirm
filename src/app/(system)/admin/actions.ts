@@ -65,6 +65,13 @@ export async function adminLogin(_: AdminState, form: FormData): Promise<AdminSt
   redirect("/admin");
 }
 
+export async function setAdminLang(form: FormData) {
+  await guard(["admin", "lawyer"]);
+  const { cookies } = await import("next/headers");
+  (await cookies()).set("mendes_admin_lang", form.get("lang") === "tr" ? "tr" : "en", { path: "/", maxAge: 31536000, sameSite: "lax", secure: true, httpOnly: true });
+  revalidatePath("/admin", "layout");
+}
+
 export async function adminLogout() {
   await endSession();
   redirect("/admin/login");
@@ -203,7 +210,7 @@ export async function updateCaseAdmin(_: AdminState, form: FormData): Promise<Ad
     actor.email,
   );
   if (form.get("notify") === "on") {
-    await addCaseEvent({ caseId: id, title: str(form, "event_title", 200) || "Case details updated", kind: "update", authorId: actor.id, notify: true });
+    await addCaseEvent({ caseId: id, title: str(form, "event_title", 200) || "sys:details_updated", kind: "update", authorId: actor.id, notify: true });
   }
   return done(`/admin/cases/${id}`);
 }
@@ -465,7 +472,7 @@ export async function saveContent(_: AdminState, form: FormData): Promise<AdminS
 }
 
 const SETTING_KEYS = [
-  "firm_name", "boss_email", "owner_email", "report_recipients", "outreach_reply_to", "office_phone", "office_address", "office_email", "office_map_url",
+  "firm_name", "boss_email", "owner_email", "report_recipients", "outreach_reply_to", "office_phone", "office_address", "office_email", "office_map_url", "mail_from", "meeting_link",
   "booking_days", "booking_start", "booking_end", "booking_slot_minutes", "booking_timezone", "booking_horizon_days",
   "ai_provider", "ai_model", "outreach_daily_limit", "announcement",
 ];

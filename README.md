@@ -16,7 +16,9 @@ A multilingual law-firm platform for **Mendes Law & Consultancy** (Kyrenia, Nort
 - **Cyprus law explained.** A catalogue of key TRNC statutes (Cap. 149, Cap. 113, Cap. 224 and others). The AI writes plain-language explanations in every site language. Each one shows an "AI-generated, not yet reviewed" notice until a lawyer marks it reviewed.
 - **Student publishing.** Law students register as authors and submit articles for editorial review. Each published article gets a permanent, citable URL and the author gets a public author page, so both can go on a CV.
 - **AI business outreach.** For companies abroad interested in investment, construction or company formation in North Cyprus. The AI drafts personalised e-mails and replies in each company's language, and **nothing is sent until a person approves it**. A monthly report goes to the partners on the 1st of every month.
-- **Admin control room** (`/admin`). Covers bookings, cases, users, articles, laws, outreach, chat transcripts, team profiles, site copy in every language, settings and a full activity log.
+- **Calendar-friendly bookings.** The confirmation e-mail includes an `.ics` invite and the firm's video link. Clients see times in their own time zone, can cancel or reschedule from a signed link, and get a reminder the day before.
+- **SEO & compliance.** `sitemap.xml` with hreflang for all five languages, `robots.txt`, and a Privacy Policy and Terms of Use in every language.
+- **Admin control room** (`/admin`), in English or Turkish. Covers bookings, cases, users, articles, laws, outreach, chat transcripts, team profiles, site copy in every language, settings and a full activity log.
 
 ## Quick start
 
@@ -34,7 +36,8 @@ Then open `http://localhost:3001/admin/setup`, enter your `ADMIN_SETUP_TOKEN` an
 | `npm run build` | Production build |
 | `npm run preview` | Run the built Worker locally |
 | `npm run deploy` | Build and deploy to Cloudflare |
-| `npm run check` | Typecheck + lint + build |
+| `npm test` | Unit tests (Vitest) |
+| `npm run check` | Typecheck + lint + tests + build (also runs in GitHub Actions) |
 
 ## Documentation
 

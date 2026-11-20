@@ -25,7 +25,7 @@ export function openChat(prefill?: string) {
   window.dispatchEvent(new CustomEvent("mendes:chat", { detail: prefill }));
 }
 
-export function ChatWidget({ locale, t, bookingHref }: { locale: string; t: Dictionary["chat"]; bookingHref: string }) {
+export function ChatWidget({ locale, t, bookingHref, privacyLabel }: { locale: string; t: Dictionary["chat"]; bookingHref: string; privacyLabel: string }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -212,7 +212,7 @@ export function ChatWidget({ locale, t, bookingHref }: { locale: string; t: Dict
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="rtl:-scale-x-100" aria-hidden><path d="M4 12h15M13 6l6 6-6 6" /></svg>
             </button>
           </div>
-          <p className="mt-2 px-1 text-[0.68rem] leading-snug text-ivory-muted/70">{t.disclaimer}</p>
+          <p className="mt-2 px-1 text-[0.68rem] leading-snug text-ivory-muted/70">{t.disclaimer} <a href={`/${locale}/privacy`} className="underline underline-offset-2 hover:text-gold">{privacyLabel}</a></p>
         </form>
       </section>
     </>

@@ -48,7 +48,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <Header locale={locale} items={nav} cta={{ href: l("/booking"), label: d.nav.booking }} portal={{ href: l("/portal"), label: d.nav.portal }} labels={{ menu: d.nav.menu, close: d.nav.close, language: d.nav.language }} />
         <main id="main" className="flex-1">{children}</main>
         <Footer locale={locale} d={d} office={{ address: settings.office_address || "", phone: settings.office_phone || "", email: settings.office_email || settings.boss_email?.split(",")[0]?.trim() || "", mapUrl: settings.office_map_url || "" }} />
-        {settings.chatbot_enabled !== "0" && <ChatWidget locale={locale} t={d.chat} bookingHref={l("/booking")} />}
+        {settings.chatbot_enabled !== "0" && <ChatWidget locale={locale} t={d.chat} bookingHref={l("/booking")} privacyLabel={d.legal.privacy} />}
       </body>
     </html>
   );

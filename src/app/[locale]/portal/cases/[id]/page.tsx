@@ -6,6 +6,7 @@ import { requireUser, isStaff } from "@/lib/auth";
 import { canAccessCase, caseDocuments, caseEvents, getCase, CASE_STATUSES } from "@/lib/data/cases";
 import { formatDate } from "@/lib/i18n/format";
 import { topicLabel } from "@/lib/topics";
+import { eventTitle } from "@/lib/case-events";
 import { Badge, Card, Container } from "@/components/ui/misc";
 import { StaffUpdateForm, UploadForm } from "@/components/portal/CaseForms";
 import { postCaseUpdate, uploadDocument } from "../../actions";
@@ -66,7 +67,7 @@ export default async function CasePage({ params }: { params: Promise<{ locale: s
                   <li key={e.id} className="relative">
                     <span aria-hidden className={`absolute -start-[2.33rem] top-1.5 h-3 w-3 rounded-full border-2 ${e.is_internal ? "border-ivory-muted bg-night" : "border-gold bg-night shadow-[0_0_12px_rgba(201,169,106,0.7)]"}`} />
                     <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-ivory-muted">{formatDate(e.created_at, locale, true)}{e.author_name ? ` · ${e.author_name}` : ""}</p>
-                    <p className="mt-2 text-lead text-ivory">{e.title} {e.is_internal ? <Badge tone="muted">internal</Badge> : null}</p>
+                    <p className="mt-2 text-lead text-ivory" dir="auto">{eventTitle(e.title, d)} {e.is_internal ? <Badge tone="muted">internal</Badge> : null}</p>
                     {e.body && <p className="mt-2 whitespace-pre-wrap text-ui leading-relaxed text-ivory/75">{e.body}</p>}
                   </li>
                 ))}

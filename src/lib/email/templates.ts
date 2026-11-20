@@ -6,6 +6,12 @@ import { topicLabel } from "@/lib/topics";
 import { button, esc, nl2br, row, shell, table, toText } from "./layout";
 import type { Mail } from "./send";
 
+export interface BookingExtras {
+  manageUrl?: string;
+  meetingLink?: string;
+  clientTz?: string | null;
+}
+
 export interface BookingLike {
   id: string;
   name: string;
@@ -52,31 +58,59 @@ ${table([
   });
 }
 
-function clientDetails(b: BookingLike, locale: Locale) {
+function clientDetails(b: BookingLike, locale: Locale, extras: BookingExtras = {}) {
   const d = staticDictionary(locale);
+  const local =
+    extras.clientTz && extras.clientTz !== "Asia/Famagusta" && extras.clientTz !== "Asia/Nicosia" && extras.clientTz !== "Europe/Nicosia"
+      ? formatDate(b.slot_start, locale, true, extras.clientTz)
+      : null;
   return table([
-    row(d.mail.when, `<strong>${esc(formatDate(b.slot_start, locale, true))}</strong> · ${b.duration_min} ${d.common.minutes}`),
+    row(d.mail.when, `<strong>${esc(formatDate(b.slot_start, locale, true))}</strong> (North Cyprus) · ${b.duration_min} ${d.common.minutes}`),
+    ...(local && local !== formatDate(b.slot_start, locale, true) ? [row(d.mail.localTime, `${esc(local)} (${esc(extras.clientTz)})`)] : []),
+    ...(extras.meetingLink && b.meeting_mode !== "office" ? [row(d.mail.meetingLink, `<a href="${esc(extras.meetingLink)}" style="color:#8a6d3b">${esc(extras.meetingLink)}</a>`)] : []),
     row(d.mail.mode, b.meeting_mode === "office" ? d.booking.office : d.booking.online),
     row(d.mail.topic, esc(topicLabel(b.topic, locale))),
   ]);
 }
 
-export function bookingReceived(b: BookingLike, locale: Locale, firm: string) {
+function manageLink(locale: Locale, url?: string) {
+  if (!url) return "";
   const d = staticDictionary(locale);
-  const body = `<p>${esc(fill(d.mail.receivedBody, { name: b.name }))}</p>${clientDetails(b, locale)}`;
+  return `<p style="margin-top:22px;font-size:13px"><a href="${esc(url)}" style="color:#8a6d3b">${esc(d.mail.manage)} →</a></p>`;
+}
+
+export function bookingReceived(b: BookingLike, locale: Locale, firm: string, extras: BookingExtras = {}) {
+  const d = staticDictionary(locale);
+  const body = `<p>${esc(fill(d.mail.receivedBody, { name: b.name }))}</p>${clientDetails(b, locale, extras)}${manageLink(locale, extras.manageUrl)}`;
   return mail(d.mail.receivedSubject, shell({ locale, title: d.mail.receivedTitle, body, firm }));
 }
 
-export function bookingDecision(b: BookingLike, locale: Locale, approved: boolean, rebookUrl: string, firm: string) {
+export function bookingDecision(b: BookingLike, locale: Locale, approved: boolean, rebookUrl: string, firm: string, extras: BookingExtras = {}) {
   const d = staticDictionary(locale);
   const note = b.decision_note ? `<p style="margin-top:18px"><strong>${esc(d.mail.note)}:</strong><br>${nl2br(b.decision_note)}</p>` : "";
   const body = approved
-    ? `<p>${esc(fill(d.mail.approvedBody, { name: b.name }))}</p>${clientDetails(b, locale)}${note}`
+    ? `<p>${esc(fill(d.mail.approvedBody, { name: b.name }))}</p>${clientDetails(b, locale, extras)}${note}<p style="font-size:13px;color:#8a8170">📅 ${esc(d.mail.calendarHint)}</p>${manageLink(locale, extras.manageUrl)}`
     : `<p>${esc(fill(d.mail.rejectedBody, { name: b.name }))}</p>${clientDetails(b, locale)}${note}<p style="margin-top:24px">${button(rebookUrl, d.mail.chooseAnother)}</p>`;
   return mail(
     approved ? d.mail.approvedSubject : d.mail.rejectedSubject,
     shell({ locale, title: approved ? d.mail.approvedTitle : d.mail.rejectedTitle, body, firm }),
   );
+}
+
+export function bookingReminder(b: BookingLike, locale: Locale, firm: string, extras: BookingExtras = {}) {
+  const d = staticDictionary(locale);
+  const body = `<p>${esc(fill(d.mail.reminderBody, { name: b.name }))}</p>${clientDetails(b, locale, extras)}${manageLink(locale, extras.manageUrl)}`;
+  return mail(d.mail.reminderSubject, shell({ locale, title: d.mail.reminderTitle, body, firm }));
+}
+
+/** Tells the managing partner that a client cancelled. */
+export function bookingCancelledToBoss(b: BookingLike, firm: string) {
+  const body = `<p><strong>${esc(b.name)}</strong> cancelled their meeting. The slot is free again.</p>${table([
+    row("Time", esc(formatDate(b.slot_start, "en", true))),
+    row("E-mail", esc(b.email)),
+    row("Area of law", esc(topicLabel(b.topic, "en"))),
+  ])}`;
+  return mail(`Meeting cancelled by client — ${b.name}`, shell({ title: "Meeting cancelled", body, firm }));
 }
 
 export function accountLink(locale: Locale, kind: "invite" | "reset", url: string, firm: string) {

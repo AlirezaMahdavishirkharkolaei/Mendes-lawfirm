@@ -9,7 +9,8 @@
     "deploy": "vinext-cloudflare deploy",
     "lint": "eslint",
     "typecheck": "cf workers types >/dev/null 2>&1; tsc --noEmit",
-    "check": "npm run typecheck && npm run lint && npm run build"
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource-variable/cormorant-garamond": "^5.3.0",
@@ -38,7 +39,8 @@
     "eslint-config-next": "16.3.3",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vitest": "^3.2.7"
   },
   "type": "module"
 }

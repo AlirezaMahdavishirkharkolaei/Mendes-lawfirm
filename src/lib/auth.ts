@@ -2,7 +2,7 @@ import "server-only";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db, now, uuid } from "@/lib/db";
-import { hashPassword, randomToken, sha256, verifyPassword } from "@/lib/security/crypto";
+import { hashPassword, needsRehash, randomToken, sha256, verifyPassword } from "@/lib/security/crypto";
 
 export type Role = "client" | "lawyer" | "admin" | "author";
 
@@ -111,6 +111,9 @@ export async function checkCredentials(email: string, password: string): Promise
   }
   if (!row.is_active) return null;
   if (!(await verifyPassword(password, row.password_hash))) return null;
+  if (needsRehash(row.password_hash)) {
+    await database.prepare("UPDATE users SET password_hash = ? WHERE id = ?").bind(await hashPassword(password), row.id).run();
+  }
   const { password_hash: _ignored, ...user } = row;
   void _ignored;
   return user;

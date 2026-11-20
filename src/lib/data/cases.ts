@@ -7,6 +7,8 @@ import type { User } from "@/lib/auth";
 import { getSettings, audit } from "@/lib/settings";
 import { sendMail } from "@/lib/email/send";
 import { caseUpdate } from "@/lib/email/templates";
+import { staticDictionary } from "@/lib/i18n";
+import { eventTitle } from "@/lib/case-events";
 
 export const CASE_STATUSES = ["intake", "in_progress", "awaiting_client", "in_court", "settled", "closed"] as const;
 export type CaseStatus = (typeof CASE_STATUSES)[number];
@@ -129,7 +131,7 @@ export async function createCase(input: {
       .bind(id, reference, input.title, input.description ?? null, input.clientId, input.lawyerId ?? null, input.practiceArea ?? null, stamp, stamp),
     database
       .prepare("INSERT INTO case_events (id, case_id, title, kind, author_id, created_at) VALUES (?, ?, ?, 'milestone', ?, ?)")
-      .bind(uuid(), id, "Case opened", null, stamp),
+      .bind(uuid(), id, "sys:case_opened", null, stamp),
   ]);
   await audit(input.actor, "case.created", "case", id, { reference });
   return id;
@@ -181,7 +183,7 @@ export async function notifyCaseParty(caseId: string, actorId: string, title: st
   const locale = asLocale(target.locale);
   const settings = await getSettings();
   const url = `${(await siteUrl())}/${locale}/portal/cases/${c.id}`;
-  await sendMail({ to: target.email, ...caseUpdate(locale, c.reference, title, url, settings.firm_name || "Mendes") });
+  await sendMail({ to: target.email, ...caseUpdate(locale, c.reference, eventTitle(title, staticDictionary(locale)), url, settings.firm_name || "Mendes") });
 }
 
 // ── Documents (R2) ────────────────────────────────────────────────────
@@ -218,7 +220,7 @@ export async function storeDocument(input: { caseId: string; file: File; uploade
     .prepare("INSERT INTO documents (id, case_id, uploader_id, filename, r2_key, mime_type, size_bytes, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
     .bind(id, input.caseId, input.uploaderId, safeFilename(input.file.name), key, input.file.type, input.file.size, input.note ?? null, now())
     .run();
-  await addCaseEvent({ caseId: input.caseId, title: `Document uploaded: ${safeFilename(input.file.name)}`, kind: "document", authorId: input.uploaderId, notify: true });
+  await addCaseEvent({ caseId: input.caseId, title: `sys:document_uploaded:${safeFilename(input.file.name)}`, kind: "document", authorId: input.uploaderId, notify: true });
   await audit(input.uploaderId, "document.uploaded", "document", id, { caseId: input.caseId, size: input.file.size });
   return id;
 }
