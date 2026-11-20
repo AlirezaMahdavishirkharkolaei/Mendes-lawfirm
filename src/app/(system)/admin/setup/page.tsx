@@ -22,7 +22,7 @@ export default async function Setup() {
         </Notice>
       )}
       <ActionForm action={setupAdmin}>
-        <Field label="Setup token" htmlFor="token"><Input id="token" name="token" type="password" required /></Field>
+        <Field label="Setup token" htmlFor="token"><Input id="token" name="token" type="text" required autoCapitalize="none" autoCorrect="off" autoComplete="off" spellCheck={false} /></Field>
         <Field label="Full name" htmlFor="name"><Input id="name" name="name" required /></Field>
         <Field label="E-mail" htmlFor="email"><Input id="email" name="email" type="email" required /></Field>
         <Field label="Password (min. 12 characters)" htmlFor="password"><Input id="password" name="password" type="password" required minLength={12} /></Field>

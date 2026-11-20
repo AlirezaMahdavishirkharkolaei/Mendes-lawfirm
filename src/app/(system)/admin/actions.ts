@@ -82,9 +82,10 @@ export async function setupAdmin(_: AdminState, form: FormData): Promise<AdminSt
   const database = await db();
   const existing = await database.prepare("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1").first();
   if (existing) return { error: "An admin already exists. Sign in instead." };
-  const expected = optional("ADMIN_SETUP_TOKEN") ?? "";
+  // Trim both sides: a stray space or newline pasted into the dashboard is a common cause of "invalid token".
+  const expected = (optional("ADMIN_SETUP_TOKEN") ?? "").trim();
   if (!expected) return { error: "ADMIN_SETUP_TOKEN is not set yet. Add it in Cloudflare → mendes → Settings → Variables and Secrets, then try again." };
-  if (!expected || !safeEqual(str(form, "token", 300), expected)) return { error: "Invalid setup token." };
+  if (!safeEqual(str(form, "token", 300), expected)) return { error: "Invalid setup token. It must match the ADMIN_SETUP_TOKEN secret exactly, including capital letters." };
   const parsed = z
     .object({ name: z.string().min(2), email: z.string().email(), password: z.string().min(12) })
     .safeParse({ name: str(form, "name"), email: str(form, "email").toLowerCase(), password: String(form.get("password") ?? "") });
