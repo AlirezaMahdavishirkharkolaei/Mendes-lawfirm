@@ -45,7 +45,9 @@ export function Reveal({
       },
       { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
     );
-    io.observe(el);
+    // Chrome counts the element's own clip-path when computing intersection, so a
+    // fully clipped element would never be "seen": watch its parent instead.
+    io.observe(effect === "clip" && el.parentElement ? el.parentElement : el);
     return () => io.disconnect();
   }, [index, effect]);
 

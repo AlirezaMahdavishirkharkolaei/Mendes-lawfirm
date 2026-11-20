@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 
 export interface NavItem {
   href: string;
   label: string;
 }
 
-export function Header({ locale, items, cta, portal, labels }: { locale: string; items: NavItem[]; cta: NavItem; portal: NavItem; labels: { menu: string; close: string; language: string } }) {
+export function Header({ locale, items, cta, portal, labels }: { locale: string; items: NavItem[]; cta: NavItem; portal: NavItem; labels: { menu: string; close: string; language: string; themeLight: string; themeDark: string } }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -55,10 +56,11 @@ export function Header({ locale, items, cta, portal, labels }: { locale: string;
 
         <div className="flex items-center gap-3">
           <LanguageSwitcher locale={locale} label={labels.language} />
+          <ThemeToggle labels={{ light: labels.themeLight, dark: labels.themeDark }} />
           <Link href={portal.href} className="hidden rounded-[2px] border border-line px-4 py-2.5 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-ivory-muted transition-colors hover:border-gold hover:text-gold-light lg:inline-flex">
             {portal.label}
           </Link>
-          <Link href={cta.href} className="btn-sheen hidden rounded-[2px] bg-gradient-to-br from-gold-light via-gold to-gold-deep px-5 py-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-night transition-transform hover:-translate-y-0.5 md:inline-flex">
+          <Link href={cta.href} className="btn-sheen hidden rounded-[2px] bg-gold-sheen px-5 py-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-on-gold transition-transform hover:-translate-y-0.5 md:inline-flex">
             {cta.label}
           </Link>
           <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls="mobile-nav" className="relative grid h-11 w-11 place-items-center rounded-full border border-line xl:hidden" aria-label={open ? labels.close : labels.menu}>
@@ -81,7 +83,7 @@ export function Header({ locale, items, cta, portal, labels }: { locale: string;
               </li>
             ))}
           </ul>
-          <Link href={cta.href} className="mt-10 inline-flex justify-center rounded-[2px] bg-gradient-to-br from-gold-light via-gold to-gold-deep px-6 py-4 text-ui font-semibold uppercase tracking-[0.16em] text-night">
+          <Link href={cta.href} className="mt-10 inline-flex justify-center rounded-[2px] bg-gold-sheen px-6 py-4 text-ui font-semibold uppercase tracking-[0.16em] text-on-gold">
             {cta.label}
           </Link>
         </nav>

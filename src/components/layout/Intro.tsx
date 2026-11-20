@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { INTRO_KEY as KEY } from "@/lib/boot-scripts";
 
-const KEY = "mendes_intro";
 const DURATION = 3400; // ms until the curtains finish opening
 
 /**
@@ -87,5 +87,3 @@ export function Intro({ tagline }: { tagline: string }) {
   );
 }
 
-/** Runs before first paint: decides whether the intro should play. */
-export const introBootScript = `(function(){try{var d=document.documentElement;if(sessionStorage.getItem("${KEY}")||matchMedia("(prefers-reduced-motion: reduce)").matches){d.dataset.intro="seen"}else{d.dataset.intro="playing"}}catch(e){document.documentElement.dataset.intro="seen"}})();`;

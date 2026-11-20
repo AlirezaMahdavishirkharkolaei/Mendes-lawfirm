@@ -19,6 +19,8 @@ const fa: Dictionary = {
     language: "زبان",
     menu: "منو",
     close: "بستن",
+    themeLight: "رفتن به تم روشن",
+    themeDark: "رفتن به تم تیره",
   },
   common: {
     learnMore: "بیشتر بدانید",

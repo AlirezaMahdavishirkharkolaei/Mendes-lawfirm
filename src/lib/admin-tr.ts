@@ -20,6 +20,8 @@ export const ADMIN_TR: Record<string, string> = {
   "Control room": "Kontrol odası",
   "View site ↗": "Siteyi görüntüle ↗",
   "Sign out": "Çıkış yap",
+  "Light theme": "Açık tema",
+  "Dark theme": "Koyu tema",
   Mendes: "Mendes",
 
   // Dashboard

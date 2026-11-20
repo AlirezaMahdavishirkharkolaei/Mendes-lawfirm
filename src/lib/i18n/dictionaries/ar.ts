@@ -19,6 +19,8 @@ const ar: Dictionary = {
     language: "اللغة",
     menu: "القائمة",
     close: "إغلاق",
+    themeLight: "التبديل إلى المظهر الفاتح",
+    themeDark: "التبديل إلى المظهر الداكن",
   },
   common: {
     learnMore: "اعرف المزيد",

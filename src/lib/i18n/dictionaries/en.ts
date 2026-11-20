@@ -17,6 +17,8 @@ const en = {
     language: "Language",
     menu: "Menu",
     close: "Close",
+    themeLight: "Switch to light theme",
+    themeDark: "Switch to dark theme",
   },
   common: {
     learnMore: "Learn more",

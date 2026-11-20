@@ -123,7 +123,7 @@ export function BookingForm({
                 disabled={!s.free}
                 onClick={() => { setSlot(s.start); setWarn(false); }}
                 aria-pressed={slot === s.start}
-                className={`rounded-[3px] border py-3 font-mono text-ui transition-all duration-300 ${slot === s.start ? "border-gold bg-gradient-to-br from-gold-light via-gold to-gold-deep text-night" : "border-line text-ivory hover:border-gold hover:text-gold-light"} disabled:cursor-not-allowed disabled:border-transparent disabled:text-ivory-muted/30 disabled:line-through`}
+                className={`rounded-[3px] border py-3 font-mono text-ui transition-all duration-300 ${slot === s.start ? "border-gold bg-gold-sheen text-on-gold" : "border-line text-ivory hover:border-gold hover:text-gold-light"} disabled:cursor-not-allowed disabled:border-transparent disabled:text-ivory-muted/30 disabled:line-through`}
                 dir="ltr"
               >
                 {fmtTime.format(new Date(s.start))}

@@ -10,7 +10,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   gold:
-    "btn-sheen bg-gradient-to-br from-gold-light via-gold to-gold-deep text-night border border-gold " +
+    "btn-sheen bg-gold-sheen text-on-gold border border-gold " +
     "shadow-[0_10px_40px_-12px_rgba(201,169,106,0.55)] hover:shadow-[0_18px_50px_-10px_rgba(201,169,106,0.7)] hover:-translate-y-0.5",
   outline: "border border-line-strong text-ivory hover:border-gold hover:text-gold-light hover:bg-gold/5",
   ghost: "text-ivory-muted hover:text-gold-light px-0",

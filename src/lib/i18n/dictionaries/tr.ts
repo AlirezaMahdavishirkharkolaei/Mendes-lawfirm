@@ -19,6 +19,8 @@ const tr: Dictionary = {
     language: "Dil",
     menu: "Menü",
     close: "Kapat",
+    themeLight: "Açık temaya geç",
+    themeDark: "Koyu temaya geç",
   },
   common: {
     learnMore: "Daha fazla",

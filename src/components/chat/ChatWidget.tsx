@@ -127,7 +127,7 @@ export function ChatWidget({ locale, t, bookingHref, privacyLabel }: { locale: s
         aria-controls="mendes-chat"
         className={`pulse-ring fixed bottom-6 end-6 z-[55] flex h-16 items-center gap-3 rounded-full border border-gold/60 bg-night-2/90 pe-2 ps-2 text-ivory shadow-[0_20px_60px_-15px_rgba(201,169,106,0.6)] backdrop-blur-xl transition-all duration-500 ease-editorial hover:border-gold sm:pe-6 ${open ? "pointer-events-none translate-y-4 opacity-0" : "opacity-100"}`}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-deep text-night">
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-gold-sheen text-on-gold">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
             <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5z" />
             <path d="M8.5 8.5h7M8.5 11.5h4.5" />
@@ -141,7 +141,7 @@ export function ChatWidget({ locale, t, bookingHref, privacyLabel }: { locale: s
         role="dialog"
         aria-label={t.title}
         aria-modal="false"
-        className={`fixed bottom-0 end-0 z-[56] flex h-[min(720px,100dvh)] w-full flex-col overflow-hidden border-line bg-night-2/95 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)] backdrop-blur-2xl transition-all duration-700 ease-editorial sm:bottom-6 sm:end-6 sm:h-[min(680px,calc(100dvh-3rem))] sm:w-[420px] sm:rounded-[6px] sm:border ${open ? "visible translate-y-0 opacity-100" : "invisible translate-y-8 opacity-0"}`}
+        className={`fixed bottom-0 end-0 z-[56] flex h-[min(720px,100dvh)] w-full flex-col overflow-hidden border-line bg-night-2/95 shadow-[0_40px_120px_-20px_var(--mendes-shadow)] backdrop-blur-2xl transition-all duration-700 ease-editorial sm:bottom-6 sm:end-6 sm:h-[min(680px,calc(100dvh-3rem))] sm:w-[420px] sm:rounded-[6px] sm:border ${open ? "visible translate-y-0 opacity-100" : "invisible translate-y-8 opacity-0"}`}
       >
         <header className="relative flex items-start justify-between gap-4 border-b border-line px-6 py-5">
           <div className="aurora pointer-events-none absolute inset-0 opacity-60" aria-hidden />
@@ -208,7 +208,7 @@ export function ChatWidget({ locale, t, bookingHref, privacyLabel }: { locale: s
               aria-label={t.placeholder}
               className="max-h-40 min-h-12 flex-1 resize-none bg-transparent px-2 py-1.5 text-ui text-ivory placeholder:text-ivory-muted/60 focus:outline-none"
             />
-            <button type="submit" disabled={busy || !input.trim()} className="grid h-11 w-11 shrink-0 place-items-center rounded-[3px] bg-gradient-to-br from-gold-light via-gold to-gold-deep text-night transition-opacity disabled:opacity-30" aria-label={t.send}>
+            <button type="submit" disabled={busy || !input.trim()} className="grid h-11 w-11 shrink-0 place-items-center rounded-[3px] bg-gold-sheen text-on-gold transition-opacity disabled:opacity-30" aria-label={t.send}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="rtl:-scale-x-100" aria-hidden><path d="M4 12h15M13 6l6 6-6 6" /></svg>
             </button>
           </div>

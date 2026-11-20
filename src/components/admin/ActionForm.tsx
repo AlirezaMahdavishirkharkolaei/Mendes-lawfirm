@@ -20,7 +20,7 @@ export function ActionButton({ action, children, variant = "outline" }: { action
   const [state, formAction, pending] = useActionState(action, {});
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <button disabled={pending} className={`rounded-[2px] px-4 py-2.5 text-[0.68rem] font-medium uppercase tracking-[0.14em] transition-colors disabled:opacity-40 ${variant === "gold" ? "bg-gold text-night hover:bg-gold-light" : "border border-line-strong text-ivory hover:border-gold hover:text-gold-light"}`}>
+      <button disabled={pending} className={`rounded-[2px] px-4 py-2.5 text-[0.68rem] font-medium uppercase tracking-[0.14em] transition-colors disabled:opacity-40 ${variant === "gold" ? "bg-gold-fill text-on-gold hover:bg-gold-light" : "border border-line-strong text-ivory hover:border-gold hover:text-gold-light"}`}>
         {pending ? "Working…" : children}
       </button>
       {state.message && <span className="text-ui-sm text-success">{state.message}</span>}

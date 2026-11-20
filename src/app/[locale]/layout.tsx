@@ -6,7 +6,8 @@ import { pageContext } from "@/lib/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatWidget } from "@/components/chat/ChatWidget";
-import { Intro, introBootScript } from "@/components/layout/Intro";
+import { Intro } from "@/components/layout/Intro";
+import { introBootScript, themeBootScript } from "@/lib/boot-scripts";
 import { siteUrl } from "@/lib/env";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -39,13 +40,13 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <html lang={meta.htmlLang} dir={meta.dir} className="h-full" suppressHydrationWarning>
       <body className="grain flex min-h-full flex-col antialiased">
-        <script dangerouslySetInnerHTML={{ __html: introBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript + introBootScript }} />
         <Intro tagline={d.home.eyebrow} />
         <a href="#main" className="skip-link">{d.common.readMore} ↓</a>
         {settings.announcement && (
-          <div className="relative z-[51] bg-gradient-to-r from-gold-deep via-gold to-gold-deep px-4 py-2 text-center text-ui-sm font-medium text-night">{settings.announcement}</div>
+          <div className="relative z-[51] bg-gradient-to-r from-fill-3 via-fill-2 to-fill-3 px-4 py-2 text-center text-ui-sm font-medium text-on-gold">{settings.announcement}</div>
         )}
-        <Header locale={locale} items={nav} cta={{ href: l("/booking"), label: d.nav.booking }} portal={{ href: l("/portal"), label: d.nav.portal }} labels={{ menu: d.nav.menu, close: d.nav.close, language: d.nav.language }} />
+        <Header locale={locale} items={nav} cta={{ href: l("/booking"), label: d.nav.booking }} portal={{ href: l("/portal"), label: d.nav.portal }} labels={{ menu: d.nav.menu, close: d.nav.close, language: d.nav.language, themeLight: d.nav.themeLight, themeDark: d.nav.themeDark }} />
         <main id="main" className="flex-1">{children}</main>
         <Footer locale={locale} d={d} office={{ address: settings.office_address || "", phone: settings.office_phone || "", email: settings.office_email || settings.boss_email?.split(",")[0]?.trim() || "", mapUrl: settings.office_map_url || "" }} />
         {settings.chatbot_enabled !== "0" && <ChatWidget locale={locale} t={d.chat} bookingHref={l("/booking")} privacyLabel={d.legal.privacy} />}

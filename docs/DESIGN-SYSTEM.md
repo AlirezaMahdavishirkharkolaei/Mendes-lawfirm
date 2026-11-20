@@ -42,3 +42,20 @@ Everything is disabled under `prefers-reduced-motion: reduce`. Content is visibl
 ## Components
 
 `components/ui`: `Button`/`ButtonLink` (gold · outline · ghost · danger), `Field`/`Input`/`Textarea`/`Select`/`Checkbox`, `SubmitButton`, `Badge`, `Notice`, `Card`, `Container`, `Label`, `SectionHeading`, `Seal`.
+
+## Light theme — "Ivory & Antique Gold"
+
+Visitors (and admins) can switch between the dark brand theme and a light
+edition with the sun/moon button in the header or the admin sidebar. The
+choice is stored in `localStorage` (`mendes_theme`) and applied before first
+paint by `themeBootScript` (`src/lib/boot-scripts.ts`), so cached pages stay
+identical for everyone and there is no flash.
+
+- Every colour comes from the tokens in `src/styles/tokens.css`; the light
+  theme only overrides them under `html[data-theme="light"]`.
+- Gold text is darkened to an antique gold that passes WCAG AA on the
+  parchment base, and hover states go deeper rather than lighter.
+- Gold fills use `bg-gold-sheen` / `bg-gold-fill` with `text-on-gold`, never
+  `text-night`, so buttons keep their contrast in both themes.
+- The crest is swapped for a re-toned asset (`mendes-crest-light.webp`).
+- The opening animation always stays dark.

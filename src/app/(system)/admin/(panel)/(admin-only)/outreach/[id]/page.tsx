@@ -45,7 +45,7 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
               <input type="hidden" name="id" value={p.id} />
               <Select name="status" defaultValue={p.status}>{["new", "drafted", "contacted", "replied", "meeting", "declined"].map((s) => <option key={s}>{s}</option>)}</Select>
               <Textarea name="notes" rows={3} defaultValue={p.notes ?? ""} placeholder={t("Internal notes (also given to the AI)")} />
-              <button className="rounded-[2px] bg-gold px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-night">{t("Update")}</button>
+              <button className="rounded-[2px] bg-gold-fill px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-on-gold">{t("Update")}</button>
             </form>
             <p className="mt-4 text-ui-sm text-ivory-muted">{t("Mark “meeting” when they book — it counts in the monthly report.")}</p>
           </Panel>

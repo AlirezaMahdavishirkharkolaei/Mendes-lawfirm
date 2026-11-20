@@ -19,6 +19,8 @@ const ru: Dictionary = {
     language: "Язык",
     menu: "Меню",
     close: "Закрыть",
+    themeLight: "Светлая тема",
+    themeDark: "Тёмная тема",
   },
   common: {
     learnMore: "Подробнее",

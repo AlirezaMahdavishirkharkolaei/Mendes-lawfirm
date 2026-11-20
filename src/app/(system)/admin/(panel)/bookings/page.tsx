@@ -48,7 +48,7 @@ export default async function Bookings({ searchParams }: { searchParams: Promise
                   <input type="hidden" name="id" value={b.id} />
                   <input name="note" placeholder={t("Message to client (optional)")} className="rounded-[2px] border border-line bg-night-3 px-3 py-2 text-ui-sm" />
                   <div className="flex gap-2">
-                    <button name="decision" value="approve" className="rounded-[2px] bg-gold px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-night">{t("Approve")}</button>
+                    <button name="decision" value="approve" className="rounded-[2px] bg-gold-fill px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-on-gold">{t("Approve")}</button>
                     <button name="decision" value="reject" className="rounded-[2px] border border-danger/60 px-3 py-2 text-[0.65rem] uppercase tracking-[0.12em] text-danger">{t("Reject")}</button>
                   </div>
                 </form>

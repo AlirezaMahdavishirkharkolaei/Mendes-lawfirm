@@ -31,6 +31,13 @@
   --mendes-line: rgba(201, 169, 106, 0.18);
   --mendes-line-strong: rgba(201, 169, 106, 0.42);
 
+  /* Gold fills (buttons, badges) and the text that sits on them */
+  --mendes-fill-1: #e8d5a8;
+  --mendes-fill-2: #c9a96a;
+  --mendes-fill-3: #8a6d3b;
+  --mendes-on-gold: #0a0a0c;
+  --mendes-shadow: rgba(0, 0, 0, 0.9);
+
   /* Utility (kept subordinate to the brand palette) */
   --mendes-success: #7fae8f;
   --mendes-danger: #d98476;
@@ -61,4 +68,42 @@
   --mendes-duration-hover: 220ms;
   --mendes-duration-reveal: 900ms;
   --mendes-reveal-distance: 28px;
+}
+
+/**
+ * "Ivory & Antique Gold" — the light theme.
+ *
+ * Same brand, daylight edition: a warm parchment base instead of white,
+ * deep espresso ink instead of black, and an antique gold dark enough to
+ * read as text (WCAG AA on the parchment). Hover states go *deeper* rather
+ * than lighter, which is what keeps gold looking expensive on a light page.
+ * Chosen per visitor with the theme switch; stored in localStorage.
+ */
+html[data-theme="light"] {
+  --mendes-night: #f7f2e9;
+  --mendes-night-2: #efe7da;
+  --mendes-night-3: #fffcf6;
+  --mendes-paper: #e9dfcc;
+  --mendes-paper-2: #ded1b8;
+
+  --mendes-ivory: #1d1914;
+  --mendes-ivory-muted: #6a604f;
+  --mendes-ink: #1d1914;
+  --mendes-ink-muted: #5d5444;
+
+  --mendes-gold: #8c6a2c;
+  --mendes-gold-light: #6f521d;
+  --mendes-gold-deep: #5a4216;
+  --mendes-line: rgba(140, 106, 44, 0.2);
+  --mendes-line-strong: rgba(140, 106, 44, 0.45);
+
+  --mendes-fill-1: #ead2a0;
+  --mendes-fill-2: #c19a52;
+  --mendes-fill-3: #8c6a2c;
+  --mendes-on-gold: #17120a;
+  --mendes-shadow: rgba(74, 56, 24, 0.28);
+
+  --mendes-success: #3d7650;
+  --mendes-danger: #a4473a;
+  --mendes-warning: #8f6719;
 }

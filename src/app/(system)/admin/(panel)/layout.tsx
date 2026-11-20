@@ -4,6 +4,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { adminLogout, setAdminLang } from "@/app/(system)/admin/actions";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,7 @@ export default async function PanelLayout({ children }: { children: ReactNode })
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
       <aside className="border-b border-line bg-night-2 p-5 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-e lg:p-6">
+        <div className="flex items-center justify-between gap-3">
         <Link href="/admin" className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/mendes-crest-sm.webp" alt="" width={34} height={42} className="h-11 w-9 object-contain" />
@@ -51,6 +53,8 @@ export default async function PanelLayout({ children }: { children: ReactNode })
             <span className="block font-mono text-[0.55rem] uppercase tracking-[0.3em] text-ivory-muted">{t("Control room")}</span>
           </span>
         </Link>
+        <ThemeToggle labels={{ light: t("Light theme"), dark: t("Dark theme") }} className="lg:hidden" />
+        </div>
         <div className="mt-6 lg:mt-10"><AdminNav items={items} /></div>
         <div className="mt-6 hidden border-t border-line pt-6 lg:block">
           <p className="text-ui text-ivory">{user.name}</p>
@@ -59,13 +63,16 @@ export default async function PanelLayout({ children }: { children: ReactNode })
             <Link href="/en" className="text-ivory-muted hover:text-gold-light">{t("View site ↗")}</Link>
             <form action={adminLogout}><button className="text-ivory-muted hover:text-danger">{t("Sign out")}</button></form>
           </div>
-          <form action={setAdminLang} className="mt-4 flex gap-1">
+          <div className="mt-4 flex items-center gap-2">
+          <ThemeToggle labels={{ light: t("Light theme"), dark: t("Dark theme") }} className="h-8 w-8" />
+          <form action={setAdminLang} className="flex gap-1">
             {(["en", "tr"] as const).map((l) => (
               <button key={l} name="lang" value={l} className={`rounded-full border px-3 py-1 font-mono text-[0.6rem] uppercase tracking-[0.14em] ${lang === l ? "border-gold bg-gold/15 text-gold-light" : "border-line text-ivory-muted hover:text-ivory"}`}>
                 {l === "en" ? "English" : "Türkçe"}
               </button>
             ))}
           </form>
+          </div>
         </div>
       </aside>
       <main className="min-w-0 p-5 md:p-10 lg:p-14">{children}</main>
