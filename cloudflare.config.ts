@@ -38,7 +38,9 @@ export default defineConfig({
       ASSETS: bindings.assets(),
       IMAGES: bindings.images(),
 
-      DB: bindings.d1({ name: "mendes-db" }),
+      // Bound by ID: the database "mendes-db" already exists on the account,
+      // and the deploy aborts if the local binding differs from the remote one.
+      DB: bindings.d1({ id: "5c6beb27-17a4-493d-969b-289273e4b7b4" }),
       // Optional: enable R2 on the account and uncomment for larger uploads.
       // FILES: bindings.r2({ name: "mendes-files" }),
       EMAIL: bindings.sendEmail(),
