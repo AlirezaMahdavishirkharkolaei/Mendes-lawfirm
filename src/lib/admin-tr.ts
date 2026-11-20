@@ -21,6 +21,7 @@ export const ADMIN_TR: Record<string, string> = {
   "View site ↗": "Siteyi görüntüle ↗",
   "Sign out": "Çıkış yap",
   "AI status": "Yapay zekâ durumu",
+  "Let the AI assistant search the web (needs TAVILY_API_KEY)": "Yapay zekâ asistanı internette arama yapabilsin (TAVILY_API_KEY gerekir)",
   "Working": "Çalışıyor",
   "Last call failed": "Son çağrı başarısız",
   "No AI call recorded yet.": "Henüz kayıtlı bir yapay zekâ çağrısı yok.",

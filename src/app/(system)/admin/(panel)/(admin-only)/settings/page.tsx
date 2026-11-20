@@ -17,7 +17,7 @@ export default async function Settings() {
   const t = await adminT();
   const [s, ai, status] = await Promise.all([getSettings(), aiConfig(), aiStatus()]);
   const days = (s.booking_days || "").split(",");
-  const keys = { gemini: "GEMINI_API_KEY", anthropic: "ANTHROPIC_API_KEY", groq: "GROQ_API_KEY", openai: "OPENAI_API_KEY" };
+  const keys = { gemini: "GEMINI_API_KEY", anthropic: "ANTHROPIC_API_KEY", groq: "GROQ_API_KEY", openai: "OPENAI_API_KEY", search: "TAVILY_API_KEY" };
   return (
     <AdminPage title={t("Settings")} lead={t("Who receives what, booking hours, AI and feature switches. Changes apply immediately.")}>
       <ActionForm action={saveSettings} className="space-y-10">
@@ -70,6 +70,7 @@ export default async function Settings() {
             <Checkbox name="laws_autogenerate" defaultChecked={s.laws_autogenerate !== "0"} label={t("Auto-generate missing law explanations")} />
             <Checkbox name="articles_open" defaultChecked={s.articles_open !== "0"} label={t("Accept new article submissions")} />
             <Checkbox name="outreach_autodraft" defaultChecked={s.outreach_autodraft !== "0"} label={t("Daily AI outreach drafting")} />
+            <Checkbox name="web_search_enabled" defaultChecked={s.web_search_enabled !== "0"} label={t("Let the AI assistant search the web (needs TAVILY_API_KEY)")} />
           </div>
           <div className="mt-6 max-w-xs"><Field label={t("Max outreach e-mails per day")} htmlFor="outreach_daily_limit"><Input id="outreach_daily_limit" name="outreach_daily_limit" type="number" min={1} max={100} defaultValue={s.outreach_daily_limit} /></Field></div>
         </Panel>

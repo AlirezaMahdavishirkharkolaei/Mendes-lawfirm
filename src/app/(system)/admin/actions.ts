@@ -503,7 +503,7 @@ const SETTING_KEYS = [
   "booking_days", "booking_start", "booking_end", "booking_slot_minutes", "booking_timezone", "booking_horizon_days",
   "ai_provider", "ai_model", "outreach_daily_limit", "announcement",
 ];
-const TOGGLES = ["chatbot_enabled", "laws_autogenerate", "articles_open", "outreach_autodraft"];
+const TOGGLES = ["chatbot_enabled", "laws_autogenerate", "articles_open", "outreach_autodraft", "web_search_enabled"];
 
 export async function saveSettings(_: AdminState, form: FormData): Promise<AdminState> {
   const actor = await guard();

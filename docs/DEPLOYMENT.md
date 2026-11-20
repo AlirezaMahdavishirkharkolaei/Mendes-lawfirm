@@ -33,6 +33,7 @@ Secrets aren't needed for the deploy itself. Add them **after** the first succes
 |---|---|---|
 | `ADMIN_SETUP_TOKEN` | once | Lets you create the first admin at `/admin/setup` |
 | `GEMINI_API_KEY` | for AI | Free key from aistudio.google.com. Without it the chatbot uses keyword mode and no AI text is generated |
+| `TAVILY_API_KEY` | optional | Free key from app.tavily.com (1,000 searches a month, no card). Lets the chatbot search the web and cite sources; capped at about 30 searches a day |
 | `RESEND_API_KEY` | for e-mail | From resend.com/api-keys — see section 2 |
 | `AUTH_SECRET` | optional | Signs e-mail links. If it isn't set, a random one is generated and kept in D1 |
 | `ANTHROPIC_API_KEY` / `GROQ_API_KEY` / `OPENAI_API_KEY` | optional | Alternative AI providers |

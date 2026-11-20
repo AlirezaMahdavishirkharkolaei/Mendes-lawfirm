@@ -256,7 +256,7 @@ function SpecialistCard({ s, t, bookingHref }: { s: Specialist; t: Dictionary["c
   );
 }
 
-/** Renders the assistant's light markdown: **bold** and [links](/same-site/path). */
+/** Renders the assistant's light markdown: **bold**, [links](/same-site/path) and [sources](https://…) in a new tab. */
 function RichText({ text }: { text: string }) {
   const parts: React.ReactNode[] = [];
   const re = /\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)\s]+)\)/g;
@@ -267,11 +267,18 @@ function RichText({ text }: { text: string }) {
     if (match[1]) parts.push(<strong key={match.index} className="font-semibold text-ivory">{match[1]}</strong>);
     else {
       const href = match[3];
-      const safe = href.startsWith("/") && !href.startsWith("//");
+      const internal = href.startsWith("/") && !href.startsWith("//");
+      const external = /^https:\/\/[^\s]+$/.test(href);
       parts.push(
-        safe ? (
-          <a key={match.index} href={href} className="text-gold underline decoration-line-strong underline-offset-4 hover:decoration-gold">
+        internal || external ? (
+          <a
+            key={match.index}
+            href={href}
+            {...(external ? { target: "_blank", rel: "noopener noreferrer nofollow" } : {})}
+            className="text-gold underline decoration-line-strong underline-offset-4 hover:decoration-gold"
+          >
             {match[2]}
+            {external && " ↗"}
           </a>
         ) : (
           match[2]
