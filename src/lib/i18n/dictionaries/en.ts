@@ -259,8 +259,8 @@ const en = {
   chat: {
     open: "Ask Mendes AI",
     title: "Mendes AI assistant",
-    subtitle: "Tell me what's happening — I'll find the right specialist.",
-    greeting: "Hello. I'm the Mendes assistant. Tell me briefly about your situation — for example a contract, a company you want to set up, a property, a tax question or an online fraud — and I'll identify the legal issues and introduce the most suitable member of our team.",
+    subtitle: "Your personal legal guide in North Cyprus.",
+    greeting: "Hi, I'm Mendes AI 👋 I can explain how things work in North Cyprus (companies, property, residency, contracts, tax, online fraud and more) and connect you with the right lawyer on our team. What's your first name, and how can I help today?",
     placeholder: "Describe your situation…",
     send: "Send",
     thinking: "Thinking…",

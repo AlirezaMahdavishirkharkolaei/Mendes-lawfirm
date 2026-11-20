@@ -33,7 +33,7 @@ import { reviewArticle, updateArticleContent, type ArticleStatus } from "@/lib/d
 import { generateLawExplanation, generateMissingLaws, getLaw, saveLawLocale } from "@/lib/data/laws";
 import { addProspect, approveAndSend, createDraft, dailyAutodraft, discardDraft, parseProspectCsv, recordInbound, INTERESTS } from "@/lib/data/outreach";
 import { buildAndSendMonthlyReport } from "@/lib/data/reports";
-import { generate, AiUnavailable } from "@/lib/ai/provider";
+import { generate, generateDetailed, AiUnavailable } from "@/lib/ai/provider";
 import { TOPIC_KEYS } from "@/lib/topics";
 import { slugify } from "@/lib/auth";
 
@@ -521,6 +521,20 @@ export async function testEmail(_: AdminState, form: FormData): Promise<AdminSta
   const to = str(form, "to", 200) || actor.email;
   const r = await sendMail({ to, subject: "Mendes — test e-mail", html: "<p>E-mail sending from the Mendes platform works.</p>", text: "E-mail sending from the Mendes platform works." });
   return r.ok ? { ok: true, message: `Test e-mail sent to ${to}.` } : { error: `Sending failed: ${r.error}` };
+}
+
+export async function testAi(): Promise<AdminState> {
+  await guard();
+  try {
+    const r = await generateDetailed({
+      system: "You are a health check. Reply with one short friendly sentence in English confirming you work.",
+      messages: [{ role: "user", content: "Are you working?" }],
+      maxTokens: 200,
+    });
+    return { ok: true, message: `AI works — ${r.provider} / ${r.model}: "${r.text.trim().slice(0, 160)}"` };
+  } catch (error) {
+    return { error: `AI failed: ${(error instanceof Error ? error.message : String(error)).slice(0, 600)}` };
+  }
 }
 
 export async function deleteChat(form: FormData) {

@@ -1,6 +1,6 @@
 import "server-only";
 import { optional } from "@/lib/env";
-import { getSettings } from "@/lib/settings";
+import { getSetting, getSettings, setSettings } from "@/lib/settings";
 
 /**
  * Provider-agnostic text generation.
@@ -30,11 +30,18 @@ export interface GenerateOptions {
 export class AiUnavailable extends Error {}
 
 const DEFAULT_MODELS: Record<string, string> = {
-  gemini: "gemini-2.5-flash",
+  gemini: "gemini-3.8-flash",
   anthropic: "claude-sonnet-5-5",
   groq: "llama-3.3-70b-versatile",
   openai: "gpt-4.1-mini",
 };
+
+/**
+ * Gemini models tried in order after the configured one. Google retires model
+ * IDs often (gemini-2.5-* started returning 404 for new keys), so a chat never
+ * depends on a single ID: on 404 / 429 / 5xx the next one is used.
+ */
+const GEMINI_FALLBACKS = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-flash-lite-latest"];
 
 const KEY_NAMES: Record<string, string> = {
   gemini: "GEMINI_API_KEY",
@@ -56,7 +63,7 @@ export async function aiConfig(): Promise<{ provider: string; model: string; con
 }
 
 async function call(provider: string, model: string, key: string, o: GenerateOptions): Promise<string> {
-  const signal = AbortSignal.timeout(30_000);
+  const signal = AbortSignal.timeout(20_000);
   const maxTokens = o.maxTokens ?? 1200;
   const temperature = o.temperature ?? 0.4;
 
@@ -70,14 +77,21 @@ async function call(provider: string, model: string, key: string, o: GenerateOpt
         contents: o.messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
         generationConfig: {
           temperature,
-          maxOutputTokens: maxTokens,
+          // Thinking models spend part of this budget before answering, so leave headroom.
+          maxOutputTokens: Math.max(maxTokens, 2048),
           ...(o.json ? { responseMimeType: "application/json" } : {}),
         },
       }),
     });
-    if (!res.ok) throw new Error(`gemini ${res.status}: ${(await res.text()).slice(0, 300)}`);
-    const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-    return data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+    if (!res.ok) throw new Error(`gemini ${model} ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const data = (await res.json()) as {
+      candidates?: { finishReason?: string; content?: { parts?: { text?: string; thought?: boolean }[] } }[];
+      promptFeedback?: { blockReason?: string };
+    };
+    const candidate = data.candidates?.[0];
+    const text = candidate?.content?.parts?.filter((p) => !p.thought).map((p) => p.text ?? "").join("") ?? "";
+    if (!text.trim()) throw new Error(`gemini ${model} returned no text (${candidate?.finishReason ?? data.promptFeedback?.blockReason ?? "empty"})`);
+    return text;
   }
 
   if (provider === "anthropic") {
@@ -120,11 +134,74 @@ async function call(provider: string, model: string, key: string, o: GenerateOpt
   throw new AiUnavailable(`Unknown AI provider "${provider}"`);
 }
 
-export async function generate(options: GenerateOptions): Promise<string> {
+export interface AiStatus {
+  ok: boolean;
+  provider: string;
+  model: string;
+  error?: string;
+  at: string;
+}
+
+/** Ordered list of (provider, model) attempts: the configured one first, then fallbacks. */
+async function attempts(): Promise<{ provider: string; model: string; key: string }[]> {
   const { provider, model } = await aiConfig();
-  const key = optional(KEY_NAMES[provider] ?? "");
-  if (!key) throw new AiUnavailable(`No API key configured for ${provider}`);
-  return call(provider, model, key, options);
+  const list: { provider: string; model: string; key: string }[] = [];
+  const add = (p: string, m: string) => {
+    const key = optional(KEY_NAMES[p] ?? "");
+    if (key && m && !list.some((a) => a.provider === p && a.model === m)) list.push({ provider: p, model: m, key });
+  };
+  add(provider, model);
+  if (provider === "gemini") for (const m of GEMINI_FALLBACKS) add("gemini", m);
+  // Any other provider that has a key is a last resort.
+  for (const p of Object.keys(KEY_NAMES)) if (p !== provider) add(p, DEFAULT_MODELS[p]);
+  return list;
+}
+
+let lastStatus = "";
+async function recordStatus(status: AiStatus) {
+  const signature = `${status.ok}|${status.provider}|${status.model}|${status.error ?? ""}`;
+  if (signature === lastStatus) return;
+  lastStatus = signature;
+  try {
+    await setSettings({ _ai_status: JSON.stringify(status) });
+  } catch {
+    /* status is best-effort */
+  }
+}
+
+/** Last AI call outcome, for the admin panel. */
+export async function aiStatus(): Promise<AiStatus | null> {
+  try {
+    const raw = await getSetting("_ai_status");
+    return raw ? (JSON.parse(raw) as AiStatus) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateDetailed(options: GenerateOptions): Promise<{ text: string; provider: string; model: string }> {
+  const list = await attempts();
+  if (!list.length) {
+    const { provider } = await aiConfig();
+    throw new AiUnavailable(`No API key configured for ${provider}`);
+  }
+  const errors: string[] = [];
+  for (const a of list) {
+    try {
+      const text = await call(a.provider, a.model, a.key, options);
+      await recordStatus({ ok: true, provider: a.provider, model: a.model, error: errors.join(" | ") || undefined, at: new Date().toISOString() });
+      return { text, provider: a.provider, model: a.model };
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+  const last = list[list.length - 1];
+  await recordStatus({ ok: false, provider: last.provider, model: last.model, error: errors.join(" | ").slice(0, 900), at: new Date().toISOString() });
+  throw new Error(`All AI models failed: ${errors.join(" | ")}`);
+}
+
+export async function generate(options: GenerateOptions): Promise<string> {
+  return (await generateDetailed(options)).text;
 }
 
 /** Generates and parses a JSON object. Tolerates code fences around it. */

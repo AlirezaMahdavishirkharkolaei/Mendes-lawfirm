@@ -261,8 +261,8 @@ const tr: Dictionary = {
   chat: {
     open: "Mendes AI'ye sorun",
     title: "Mendes AI asistanı",
-    subtitle: "Ne olduğunu anlatın — doğru uzmanı bulayım.",
-    greeting: "Merhaba, ben Mendes asistanıyım. Durumunuzu kısaca anlatın — örneğin bir sözleşme, kurmak istediğiniz bir şirket, bir gayrimenkul, bir vergi sorusu ya da internet dolandırıcılığı — hukuki konuları belirleyip ekibimizden en uygun kişiyi tanıtayım.",
+    subtitle: "Kuzey Kıbrıs'ta kişisel hukuk rehberiniz.",
+    greeting: "Merhaba, ben Mendes AI 👋 Kuzey Kıbrıs'ta şirket, gayrimenkul, oturum izni, sözleşme, vergi, internet dolandırıcılığı gibi konularda süreçleri anlatabilir ve sizi ekibimizdeki doğru avukata yönlendirebilirim. Adınız nedir, bugün size nasıl yardımcı olabilirim?",
     placeholder: "Durumunuzu anlatın…",
     send: "Gönder",
     thinking: "Düşünüyor…",

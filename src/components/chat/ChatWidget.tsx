@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -164,7 +165,7 @@ export function ChatWidget({ locale, t, bookingHref, privacyLabel }: { locale: s
           <Bubble role="assistant">{t.greeting}</Bubble>
           {messages.map((m, i) => (
             <div key={i} className="fade-in space-y-3">
-              <Bubble role={m.role}>{m.content}</Bubble>
+              <Bubble role={m.role}>{m.role === "assistant" ? <RichText text={m.content} /> : m.content}</Bubble>
               {m.topics && m.topics.length > 0 && (
                 <div className="flex flex-wrap gap-2 ps-1">
                   <span className="sr-only">{t.topics}:</span>
@@ -219,7 +220,7 @@ export function ChatWidget({ locale, t, bookingHref, privacyLabel }: { locale: s
   );
 }
 
-function Bubble({ role, children }: { role: "user" | "assistant"; children: string }) {
+function Bubble({ role, children }: { role: "user" | "assistant"; children: React.ReactNode }) {
   const mine = role === "user";
   return (
     <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
@@ -253,4 +254,32 @@ function SpecialistCard({ s, t, bookingHref }: { s: Specialist; t: Dictionary["c
       </a>
     </div>
   );
+}
+
+/** Renders the assistant's light markdown: **bold** and [links](/same-site/path). */
+function RichText({ text }: { text: string }) {
+  const parts: React.ReactNode[] = [];
+  const re = /\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)\s]+)\)/g;
+  let last = 0;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(text))) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    if (match[1]) parts.push(<strong key={match.index} className="font-semibold text-ivory">{match[1]}</strong>);
+    else {
+      const href = match[3];
+      const safe = href.startsWith("/") && !href.startsWith("//");
+      parts.push(
+        safe ? (
+          <a key={match.index} href={href} className="text-gold underline decoration-line-strong underline-offset-4 hover:decoration-gold">
+            {match[2]}
+          </a>
+        ) : (
+          match[2]
+        ),
+      );
+    }
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return <>{parts}</>;
 }

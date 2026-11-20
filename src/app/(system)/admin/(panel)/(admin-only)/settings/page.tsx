@@ -1,21 +1,21 @@
 import { adminT } from "@/lib/admin-i18n";
 import { requireUser } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
-import { aiConfig } from "@/lib/ai/provider";
+import { aiConfig, aiStatus } from "@/lib/ai/provider";
 import { optional } from "@/lib/env";
 import { AdminPage, Panel } from "@/components/admin/ui";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { Checkbox, Field, Input, Select } from "@/components/ui/fields";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { Badge } from "@/components/ui/misc";
-import { saveSettings, testEmail } from "@/app/(system)/admin/actions";
+import { saveSettings, testAi, testEmail } from "@/app/(system)/admin/actions";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default async function Settings() {
   await requireUser(["admin"], "/admin/login");
   const t = await adminT();
-  const [s, ai] = await Promise.all([getSettings(), aiConfig()]);
+  const [s, ai, status] = await Promise.all([getSettings(), aiConfig(), aiStatus()]);
   const days = (s.booking_days || "").split(",");
   const keys = { gemini: "GEMINI_API_KEY", anthropic: "ANTHROPIC_API_KEY", groq: "GROQ_API_KEY", openai: "OPENAI_API_KEY" };
   return (
@@ -57,7 +57,7 @@ export default async function Settings() {
                 <option value="openai">{t("OpenAI")}</option>
               </Select>
             </Field>
-            <Field label={t("Model")} htmlFor="ai_model" hint={`Currently: ${ai.model}. Leave empty for the provider default.`}><Input id="ai_model" name="ai_model" defaultValue={s.ai_model} /></Field>
+            <Field label={t("Model")} htmlFor="ai_model" hint={`Currently: ${ai.model}. Leave empty for the provider default; if it fails, newer Gemini models are tried automatically.`}><Input id="ai_model" name="ai_model" defaultValue={s.ai_model} /></Field>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             {Object.entries(keys).map(([p, k]) => <Badge key={p} tone={optional(k) ? "success" : "muted"}>{k} {optional(k) ? "set" : "not set"}</Badge>)}
@@ -75,6 +75,20 @@ export default async function Settings() {
         </Panel>
         <SubmitButton pending={t("Saving…")} size="lg">{t("Save settings")}</SubmitButton>
       </ActionForm>
+      <Panel title={t("AI status")}>
+        {status ? (
+          <div className="mb-6 space-y-2 text-ui-sm">
+            <Badge tone={status.ok ? "success" : "danger"}>{status.ok ? `${t("Working")} — ${status.provider} / ${status.model}` : t("Last call failed")}</Badge>
+            <p className="text-ivory-muted">{new Date(status.at).toLocaleString("en-GB", { timeZone: "Asia/Nicosia" })}</p>
+            {status.error && <p className="break-words font-mono text-[0.7rem] text-ivory-muted">{status.error}</p>}
+          </div>
+        ) : (
+          <p className="mb-6 text-ui-sm text-ivory-muted">{t("No AI call recorded yet.")}</p>
+        )}
+        <ActionForm action={testAi}>
+          <SubmitButton pending={t("Testing…")} variant="outline">{t("Test AI now")}</SubmitButton>
+        </ActionForm>
+      </Panel>
       <Panel title={t("E-mail delivery")}>
         <div className="mb-6 flex flex-wrap gap-3">
           <Badge tone={optional("RESEND_API_KEY") ? "success" : "warning"}>RESEND_API_KEY {optional("RESEND_API_KEY") ? "set — sending via Resend" : "not set — sending via Cloudflare Email Service"}</Badge>

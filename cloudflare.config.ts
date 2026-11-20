@@ -50,7 +50,7 @@ export default defineConfig({
       SITE_URL: bindings.text("https://mendes.lawyer-alirezamahdavi.workers.dev"),
       MAIL_FROM: bindings.text("no-reply@mendes.law"),
       AI_PROVIDER: bindings.text("gemini"),
-      AI_MODEL: bindings.text("gemini-2.5-flash"),
+      AI_MODEL: bindings.text("gemini-3.8-flash"),
 
       // Secrets are NOT declared here so a deploy never blocks on them.
       // Set them after the first deploy in the dashboard (Settings →
