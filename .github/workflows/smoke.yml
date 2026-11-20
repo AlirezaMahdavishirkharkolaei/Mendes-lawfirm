@@ -1,0 +1,29 @@
+name: Production smoke test
+
+# Run by hand (Actions → Production smoke test → Run workflow) after a deploy
+# to check that the live site answers and to see how fast each page is.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Site origin
+        default: https://mendes.lawyer-alirezamahdavi.workers.dev
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Time key pages
+        env:
+          ORIGIN: ${{ inputs.url }}
+        run: |
+          fail=0
+          for path in /en /en/team /en/laws /en/practice /en/booking /en/insights /fa /admin/login /api/chat; do
+            for i in 1 2 3; do
+              out=$(curl -s -o /dev/null -w "%{http_code} ttfb=%{time_starttransfer}s total=%{time_total}s cf-cache=%header{cf-cache-status} x-vinext=%header{x-vinext-cache}" "$ORIGIN$path")
+              echo "$path #$i $out"
+            done
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$ORIGIN$path")
+            case "$code" in 2*|3*|405) ;; *) echo "::error::$path returned $code"; fail=1;; esac
+          done
+          exit $fail
